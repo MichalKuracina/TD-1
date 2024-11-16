@@ -2,6 +2,7 @@ const canvasWidth = 700;
 const canvasHeight = 500;
 
 let bullets = [];
+let enemies = [];
 let app;
 let bullet;
 let elapsed = 0;
@@ -21,10 +22,17 @@ function run() {
     grid(app);
     coordinates(app, canvasWidth, canvasHeight);
 
-    // app.stage.on("pointerdown", (event) => {
-    //   const mousePosition = event.data.global;
-    //   createBullet(Math.round(mousePosition.x), Math.round(mousePosition.y));
-    // });
+    app.stage.on("pointerdown", (event) => {
+      const mousePosition = event.data.global;
+      enemy = new Enemy(
+        Math.round(mousePosition.x),
+        Math.round(mousePosition.y),
+        10,
+        0xfc0303
+      );
+      app.stage.addChild(enemy);
+      enemies.push(enemy);
+    });
 
     app.stage.eventMode = "static";
     app.stage.hitArea = app.screen;
@@ -32,12 +40,9 @@ function run() {
     turret = new Turret(200, 200, 10, 0x0f03fc);
     app.stage.addChild(turret);
 
-    enemy = new Enemy(600, 400, 10, 0xfc0303);
-    app.stage.addChild(enemy);
-
-    bullet = new Bullet3(200, 200, 200, 200, 600, 400, 1);
-    app.stage.addChild(bullet);
-    bullets.push(bullet);
+    // bullet = new Bullet3(200, 200, 200, 200, 600, 400, 1);
+    // app.stage.addChild(bullet);
+    // bullets.push(bullet);
 
     app.ticker.add(updateTick);
   })();
@@ -46,25 +51,25 @@ function run() {
 function updateTick(deltaTime) {
   elapsed += deltaTime.deltaMS;
 
-  //   if (elapsed >= interval) {
-  //     elapsed = 0;
-  //     const b1 = turret.shoot(enemy);
-  //     app.stage.addChild(b1);
-  //     bullets.push(b1);
-  //   }
+  if (elapsed >= interval) {
+    elapsed = 0;
+    if (enemies.length > 0) {
+      const closesEnemy = turret.getClosesEnemy(enemies);
+      const bullet = turret.shoot(closesEnemy);
+      app.stage.addChild(bullet);
+      bullets.push(bullet);
+    }
+  }
 
   for (let i = 0; i < bullets.length; i++) {
     bullets[i].move();
 
-    if (checkHitEnemy(bullets[i], enemy)) {
+    if (checkHitEnemy(bullets[i], enemies)) {
       console.log("Hit!");
-      app.stage.removeChild(bullets[i]);
-      bullets[i].destroy();
+
       bullets.splice(i, 1);
       i--;
 
-      app.stage.removeChild(enemy);
-      enemy.destroy();
       continue;
     }
 
@@ -78,12 +83,25 @@ function updateTick(deltaTime) {
   }
 }
 
-function checkHitEnemy(bullet, enemy) {
-  const dx = Math.abs(bullet.position_x - enemy.x);
-  const dy = Math.abs(bullet.position_y - enemy.y);
-  const distance = Math.sqrt(dx * dx + dy * dy);
+function checkHitEnemy(bullet, enemies) {
+  let hit = false;
+  for (let i = 0; i < enemies.length; i++) {
+    const dx = Math.abs(bullet.position_x - enemies[i].x);
+    const dy = Math.abs(bullet.position_y - enemies[i].y);
+    const distance = Math.sqrt(dx * dx + dy * dy);
 
-  return distance <= bullet.radius + enemy.radius;
+    if (distance <= bullet.radius + enemies[i].radius) {
+      app.stage.removeChild(bullet);
+      bullet.destroy();
+
+      app.stage.removeChild(enemies[i]);
+      enemies[i].destroy();
+      enemies.splice(i, 1);
+
+      hit = true;
+    }
+  }
+  return hit;
 }
 
 function checkHitWall(bullet) {
