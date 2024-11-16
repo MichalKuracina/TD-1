@@ -1,0 +1,12 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "edge",
+            "request": "launch",
+            "name": "Launch PixiJS App in Edge",
+            "url": "http://127.0.0.1:5500/index.html", 
+            "webRoot": "${workspaceFolder}"
+        }
+    ]
+}
