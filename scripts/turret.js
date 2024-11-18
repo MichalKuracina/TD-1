@@ -1,10 +1,11 @@
 class Turret extends PIXI.Graphics {
-  constructor(x = 0, y = 0, radius = 10, color = 0x0f03fc) {
+  constructor(x = 0, y = 0, radius = 10, color = 0x0f03fc, damage = 1) {
     super();
     this.x = x;
     this.y = y;
     this.radius = radius;
     this.color = color;
+    this.damage = damage;
 
     this.drawTurret();
   }
@@ -15,74 +16,60 @@ class Turret extends PIXI.Graphics {
   }
 
   shoot(enemy) {
-    const enemy_x = enemy.position._x;
-    const enemy_y = enemy.position._y;
-    // console.log(enemy_X);
-    return new Bullet3(this.x, this.y, this.x, this.y, enemy_x, enemy_y, 1);
-    // return new Bullet2(this.x, this.y, enemy_x, enemy_y);
+    const enemy_x = enemy.x;
+    const enemy_y = enemy.y;
+    return new Bullet(this.x, this.y, this.x, this.y, enemy_x, enemy_y, 1);
   }
 
   getClosesEnemy(enemies) {
     let currentEnemyDistance;
     let closesEnemyDistance;
+    let closesEnemyObject;
 
     for (let i = 0; i < enemies.length; i++) {
       // Q1
-      if (
-        enemies[i].enemy_y <= this.turret_y &&
-        enemies[i].enemy_x > this.turret_x
-      ) {
+      if (enemies[i].y <= this.y && enemies[i].x > this.x) {
         //   console.log("Q1");
-        const a = this.turret_y - enemies[i].enemy_y;
-        const b = enemies[i].enemy_x - this.turret_x;
+        const a = this.y - enemies[i].y;
+        const b = enemies[i].x - this.x;
         currentEnemyDistance = Math.sqrt(a * a + b * b);
       }
 
       // Q2
-      if (
-        enemies[i].enemy_y < this.turret_y &&
-        enemies[i].enemy_x <= this.turret_x
-      ) {
+      if (enemies[i].y < this.y && enemies[i].x <= this.x) {
         //   console.log("Q2");
-        const a = this.turret_y - enemies[i].enemy_y;
-        const b = this.turret_x - enemies[i].enemy_x;
+        const a = this.y - enemies[i].y;
+        const b = this.x - enemies[i].x;
         currentEnemyDistance = Math.sqrt(a * a + b * b);
       }
 
       // Q3
-      if (
-        enemies[i].enemy_y >= this.turret_y &&
-        enemies[i].enemy_x < this.turret_x
-      ) {
+      if (enemies[i].y >= this.y && enemies[i].x < this.x) {
         //   console.log("Q3");
-        const a = enemies[i].enemy_y - this.turret_y;
-        const b = this.turret_x - enemies[i].enemy_x;
+        const a = enemies[i].y - this.y;
+        const b = this.x - enemies[i].x;
         currentEnemyDistance = Math.sqrt(a * a + b * b);
       }
 
       // Q4
-      if (
-        enemies[i].enemy_y > this.turret_y &&
-        enemies[i].enemy_x >= this.turret_x
-      ) {
+      if (enemies[i].y > this.y && enemies[i].x >= this.x) {
         //   console.log("Q4");
-        const a = enemies[i].enemy_y - this.turret_y;
-        const b = enemies[i].enemy_x - this.turret_x;
+        const a = enemies[i].y - this.y;
+        const b = enemies[i].x - this.x;
         currentEnemyDistance = Math.sqrt(a * a + b * b);
       }
+
+      if (i === 0) {
+        closesEnemyDistance = currentEnemyDistance;
+        closesEnemyObject = enemies[i];
+        continue;
+      }
+
+      if (currentEnemyDistance < closesEnemyDistance) {
+        closesEnemyDistance = currentEnemyDistance;
+        closesEnemyObject = enemies[i];
+      }
     }
-    return closesEnemyDistance;
+    return closesEnemyObject;
   }
-
-  //   // Method to update the circle's color
-  //   setColor(newColor) {
-  //     this.color = newColor;
-  //     this.drawCircle(); // Redraw with the new color
-  //   }
-
-  //   // Method to update the circle's radius
-  //   setRadius(newRadius) {
-  //     this.radius = newRadius;
-  //     this.drawCircle(); // Redraw with the new radius
-  //   }
 }

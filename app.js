@@ -2,11 +2,17 @@ const canvasWidth = 700;
 const canvasHeight = 500;
 
 let bullets = [];
+let turrets = [];
 let enemies = [];
+
 let app;
 let bullet;
 let elapsed = 0;
 const interval = 1000;
+
+let towerCount = 0;
+let enemyCount = 0;
+let hudContainer;
 
 function run() {
   (async () => {
@@ -21,6 +27,7 @@ function run() {
 
     grid(app);
     coordinates(app, canvasWidth, canvasHeight);
+    hudContainer = hud();
 
     app.stage.on("pointerdown", (event) => {
       const mousePosition = event.data.global;
@@ -28,7 +35,8 @@ function run() {
         Math.round(mousePosition.x),
         Math.round(mousePosition.y),
         10,
-        0xfc0303
+        0xfc0303,
+        4
       );
       app.stage.addChild(enemy);
       enemies.push(enemy);
@@ -37,8 +45,13 @@ function run() {
     app.stage.eventMode = "static";
     app.stage.hitArea = app.screen;
 
-    turret = new Turret(200, 200, 10, 0x0f03fc);
-    app.stage.addChild(turret);
+    // turret = new Turret(200, 200, 10, 0x0f03fc, 1);
+    // app.stage.addChild(turret);
+    // turrets.push(turret);
+
+    // turret = new Turret(200, 300, 10, 0x0f03fc);
+    // app.stage.addChild(turret);
+    // turrets.push(turret);
 
     // bullet = new Bullet3(200, 200, 200, 200, 600, 400, 1);
     // app.stage.addChild(bullet);
@@ -49,15 +62,22 @@ function run() {
 }
 
 function updateTick(deltaTime) {
+  hudContainer.children[0].text = `Turrets: ${turrets.length}`;
+  hudContainer.children[1].text = `Enemies: ${enemies.length}`;
+
   elapsed += deltaTime.deltaMS;
 
   if (elapsed >= interval) {
     elapsed = 0;
     if (enemies.length > 0) {
-      const closesEnemy = turret.getClosesEnemy(enemies);
-      const bullet = turret.shoot(closesEnemy);
-      app.stage.addChild(bullet);
-      bullets.push(bullet);
+      for (let i = 0; i < turrets.length; i++) {
+        const closesEnemy = turrets[i].getClosesEnemy(enemies);
+        //   console.log(closesEnemy);
+        const bullet = turrets[i].shoot(closesEnemy);
+        bullet.damage = turrets[i].damage;
+        app.stage.addChild(bullet);
+        bullets.push(bullet);
+      }
     }
   }
 
@@ -94,9 +114,13 @@ function checkHitEnemy(bullet, enemies) {
       app.stage.removeChild(bullet);
       bullet.destroy();
 
-      app.stage.removeChild(enemies[i]);
-      enemies[i].destroy();
-      enemies.splice(i, 1);
+      enemies[i].health = enemies[i].health - bullet.damage;
+
+      if (enemies[i].health <= 0) {
+        app.stage.removeChild(enemies[i]);
+        enemies[i].destroy();
+        enemies.splice(i, 1);
+      }
 
       hit = true;
     }
