@@ -18,11 +18,12 @@ class Bullet extends PIXI.Graphics {
     this.turret_y = turret_y;
     this.enemy_x = enemy_x;
     this.enemy_y = enemy_y;
-    this.distance = 0;
     this.speed = speed;
     this.radius = radius;
     this.color = color;
     this.damage = damage;
+
+    this.distance = 0;
 
     this.drawBullet();
   }

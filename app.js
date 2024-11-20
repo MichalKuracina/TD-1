@@ -1,6 +1,18 @@
 const canvasWidth = 700;
 const canvasHeight = 500;
 
+const route = [
+  { x: 0, y: 100 },
+  { x: 500, y: 100 },
+  { x: 550, y: 150 },
+  { x: 500, y: 200 },
+  { x: 200, y: 200 },
+  { x: 100, y: 300 },
+  { x: 150, y: 350 },
+  { x: 500, y: 400 },
+  { x: 500, y: 500 },
+];
+
 let bullets = [];
 let turrets = [];
 let enemies = [];
@@ -9,6 +21,11 @@ let app;
 let bullet;
 let elapsed = 0;
 const interval = 1000;
+
+const spawnInterval = 1000;
+let spawnElapsed = 0;
+const spawnLimit = 4;
+let spawnCounter = 0;
 
 let towerCount = 0;
 let enemyCount = 0;
@@ -29,21 +46,24 @@ function run() {
     coordinates(app, canvasWidth, canvasHeight);
     hudContainer = hud();
 
-    app.stage.on("pointerdown", (event) => {
-      const mousePosition = event.data.global;
-      enemy = new Enemy(
-        Math.round(mousePosition.x),
-        Math.round(mousePosition.y),
-        10,
-        0xfc0303,
-        4
-      );
-      app.stage.addChild(enemy);
-      enemies.push(enemy);
-    });
+    // app.stage.on("pointerdown", (event) => {
+    //   const mousePosition = event.data.global;
+    //   enemy = new Enemy(
+    //     Math.round(mousePosition.x),
+    //     Math.round(mousePosition.y),
+    //     10,
+    //     0xfc0303,
+    //     5,
+    //     5
+    //   );
+    //   app.stage.addChild(enemy);
+    //   enemies.push(enemy);
+    // });
 
     app.stage.eventMode = "static";
     app.stage.hitArea = app.screen;
+
+    drawPath(route);
 
     // turret = new Turret(200, 200, 10, 0x0f03fc, 1);
     // app.stage.addChild(turret);
@@ -53,9 +73,20 @@ function run() {
     // app.stage.addChild(turret);
     // turrets.push(turret);
 
-    // bullet = new Bullet3(200, 200, 200, 200, 600, 400, 1);
+    // bullet = new Bullet(200, 200, 200, 200, 600, 400, 1);
     // app.stage.addChild(bullet);
     // bullets.push(bullet);
+
+    // let enemy = new Enemy(
+    //   300,
+    //   200,
+    //   (radius = 50),
+    //   (color = 0xff0000),
+    //   (health = 0),
+    //   5
+    // );
+    // app.stage.addChild(enemy);
+    // enemies.push(enemy);
 
     app.ticker.add(updateTick);
   })();
@@ -65,7 +96,40 @@ function updateTick(deltaTime) {
   hudContainer.children[0].text = `Turrets: ${turrets.length}`;
   hudContainer.children[1].text = `Enemies: ${enemies.length}`;
 
-  elapsed += deltaTime.deltaMS;
+  spawnElapsed += deltaTime.deltaMS;
+
+  if (spawnElapsed >= spawnInterval) {
+    spawnElapsed = 0;
+    if (spawnCounter < spawnLimit) {
+      const enemy = new Enemy(
+        route[0].x,
+        route[0].y,
+        10,
+        0xfc0303,
+        5,
+        5,
+        2,
+        Array.from(route)
+      );
+      app.stage.addChild(enemy);
+      enemies.push(enemy);
+      spawnCounter++;
+    }
+  }
+
+  if (enemies.length > 0) {
+    for (let i = 0; i < enemies.length; i++) {
+      enemies[i].move(deltaTime.deltaMS);
+
+      if (enemies[i].finished) {
+        console.log("Collision!");
+        app.stage.removeChild(enemies[i]);
+        enemies[i].destroy();
+        enemies.splice(i, 1);
+        i--;
+      }
+    }
+  }
 
   if (elapsed >= interval) {
     elapsed = 0;
@@ -78,6 +142,7 @@ function updateTick(deltaTime) {
         app.stage.addChild(bullet);
         bullets.push(bullet);
       }
+      //   console.log("s");
     }
   }
 
@@ -114,7 +179,10 @@ function checkHitEnemy(bullet, enemies) {
       app.stage.removeChild(bullet);
       bullet.destroy();
 
-      enemies[i].health = enemies[i].health - bullet.damage;
+      //   enemies[i].health = enemies[i].health - bullet.damage;
+
+      enemies[i].hit(bullet.damage);
+      //   console.log(enemies[i].healthWidth);
 
       if (enemies[i].health <= 0) {
         app.stage.removeChild(enemies[i]);
@@ -145,3 +213,26 @@ function checkHitWall(bullet) {
 
   return false;
 }
+
+// const route = [
+//     { x: 0, y: 100 },
+//     { x: 500, y: 100 },
+//     { x: 550, y: 150 },
+//     { x: 500, y: 200 },
+//     { x: 200, y: 200 },
+//     { x: 100, y: 300 },
+//     { x: 150, y: 350 },
+//     { x: 500, y: 400 },
+//     { x: 500, y: 500 },
+//   ];
+
+// for (let i = 0; i < route.length; i++) {
+//     const pathTileWidth = 50;
+//     const pathTile = new PIXI.Graphics();
+//     pathTile.roundRect(route[i].x - pathTileWidth, route[i].y - pathTileWidth, 100, 50, 30);
+//     pathTile.fill(0x58593e);
+//     app.stage.addChild(pathTile);
+
+// }
+
+function drawPath(route) {}

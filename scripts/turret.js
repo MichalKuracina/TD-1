@@ -1,11 +1,22 @@
 class Turret extends PIXI.Graphics {
-  constructor(x = 0, y = 0, radius = 10, color = 0x0f03fc, damage = 1) {
+  constructor(
+    x = 0,
+    y = 0,
+    radius = 10,
+    color = 0x0f03fc,
+    damage = 1,
+    speed = 1
+  ) {
     super();
     this.x = x;
     this.y = y;
     this.radius = radius;
     this.color = color;
     this.damage = damage;
+    this.speed = speed;
+
+    this.bullet_radius = 5;
+    this.bullet_color = 0xf4fc03;
 
     this.drawTurret();
   }
@@ -18,7 +29,18 @@ class Turret extends PIXI.Graphics {
   shoot(enemy) {
     const enemy_x = enemy.x;
     const enemy_y = enemy.y;
-    return new Bullet(this.x, this.y, this.x, this.y, enemy_x, enemy_y, 1);
+    return new Bullet(
+      this.x,
+      this.y,
+      this.x,
+      this.y,
+      enemy_x,
+      enemy_y,
+      this.speed,
+      this.bullet_radius,
+      this.bullet_color,
+      this.damage
+    );
   }
 
   getClosesEnemy(enemies) {
