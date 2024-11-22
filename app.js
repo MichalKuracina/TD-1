@@ -3,14 +3,13 @@ const canvasHeight = 500;
 
 const route = [
   { x: 0, y: 100 },
-  { x: 500, y: 100 },
-  { x: 550, y: 150 },
-  { x: 500, y: 200 },
-  { x: 200, y: 200 },
-  { x: 100, y: 300 },
-  { x: 150, y: 350 },
-  { x: 500, y: 400 },
-  { x: 500, y: 500 },
+  { x: 550, y: 100 },
+  { x: 550, y: 300 },
+  { x: 250, y: 300 },
+  { x: 250, y: 200 },
+  { x: 100, y: 200 },
+  { x: 100, y: 450 },
+  { x: 700, y: 450 },
 ];
 
 let bullets = [];
@@ -24,12 +23,16 @@ const interval = 1000;
 
 const spawnInterval = 1000;
 let spawnElapsed = 0;
-const spawnLimit = 4;
+const spawnLimit = 0;
 let spawnCounter = 0;
 
 let towerCount = 0;
 let enemyCount = 0;
 let hudContainer;
+
+let sprite;
+let texture;
+let spritesheet;
 
 function run() {
   (async () => {
@@ -46,39 +49,10 @@ function run() {
     coordinates(app, canvasWidth, canvasHeight);
     hudContainer = hud();
 
-    const atlasData = {
-      frames: {
-        enemy1: {
-          frame: { x: 0, y: 0, w: 64, h: 64 },
-          sourceSize: { w: 64, h: 64 },
-          spriteSourceSize: { x: 0, y: 0, w: 64, h: 64 },
-        },
-        enemy2: {
-          frame: { x: 64, y: 0, w: 64, h: 64 },
-          sourceSize: { w: 64, h: 64 },
-          spriteSourceSize: { x: 0, y: 0, w: 64, h: 64 },
-        },
-      },
-      meta: {
-        image: "/assets/roads2W.png",
-        // format: 'RGBA8888',
-        size: { w: 512, h: 192 },
-        // scale: 1
-      },
-      animations: {
-        enemy: ["enemy1", "enemy2"], //array of frames by name
-      },
-    };
+    let futureRoute = Array.from(route);
+    futureRoute[0].x = -32;
+    await drawRoad(futureRoute);
 
-    const texture = await PIXI.Assets.load(atlasData.meta.image);
-    const spritesheet = new PIXI.Spritesheet(texture, atlasData);
-    await spritesheet.parse();
-    const animatedSprite = new PIXI.AnimatedSprite(
-      spritesheet.animations.enemy
-    );
-    app.stage.addChild(animatedSprite);
-    animatedSprite.play();
-    animatedSprite.animationSpeed = 0.15;
     // app.stage.on("pointerdown", (event) => {
     //   const mousePosition = event.data.global;
     //   enemy = new Enemy(
@@ -95,8 +69,6 @@ function run() {
 
     app.stage.eventMode = "static";
     app.stage.hitArea = app.screen;
-
-    drawPath(route);
 
     // turret = new Turret(200, 200, 10, 0x0f03fc, 1);
     // app.stage.addChild(turret);
@@ -201,6 +173,184 @@ function updateTick(deltaTime) {
   }
 }
 
+async function drawRoad(routeObj) {
+  if (routeObj.length === 1) {
+    console.log("Hit end");
+    return;
+  }
+
+  const atlasData = {
+    frames: {
+      road: {
+        frame: { x: 128, y: 0, w: 64, h: 64 },
+        sourceSize: { w: 64, h: 64 },
+        spriteSourceSize: { x: 0, y: 0, w: 64, h: 64 },
+      },
+      q1curve: {
+        frame: { x: 64, y: 64, w: 64, h: 64 },
+        sourceSize: { w: 64, h: 64 },
+        spriteSourceSize: { x: 0, y: 0, w: 64, h: 64 },
+      },
+      q2curve: {
+        frame: { x: 0, y: 64, w: 64, h: 64 },
+        sourceSize: { w: 64, h: 64 },
+        spriteSourceSize: { x: 0, y: 0, w: 64, h: 64 },
+      },
+      q3curve: {
+        frame: { x: 128, y: 64, w: 64, h: 64 },
+        sourceSize: { w: 64, h: 64 },
+        spriteSourceSize: { x: 0, y: 0, w: 64, h: 64 },
+      },
+      q4curve: {
+        frame: { x: 128, y: 64, w: 64, h: 64 },
+        sourceSize: { w: 64, h: 64 },
+        spriteSourceSize: { x: 0, y: 0, w: 64, h: 64 },
+      },
+    },
+    meta: {
+      image: "/assets/roads2W.png",
+      size: { w: 512, h: 192 },
+    },
+  };
+
+  const texture = await PIXI.Assets.load(atlasData.meta.image);
+  const spritesheet = new PIXI.Spritesheet(texture, atlasData);
+  await spritesheet.parse();
+
+  //   [
+  //     { x: 0, y: 100 },
+  //     { x: 500, y: 100 },
+  //     { x: 550, y: 150 },
+  //     { x: 500, y: 200 },
+  //     { x: 200, y: 200 },
+  //     { x: 100, y: 300 },
+  //     { x: 150, y: 350 },
+  //     { x: 500, y: 400 },
+  //     { x: 500, y: 500 },
+  //   ];
+
+  const spriteWidth = 64;
+  let new_x;
+  let new_y;
+  let angleRadians;
+
+  if (routeObj[1].y <= routeObj[0].y && routeObj[1].x > routeObj[0].x) {
+    console.log("Q1");
+    const a = routeObj[0].y - routeObj[1].y;
+    const b = routeObj[1].x - routeObj[0].x;
+    const c = Math.sqrt(a * a + b * b);
+    const newDistance = c - spriteWidth;
+
+    const tangent = b / a;
+    angleRadians = Math.atan(tangent);
+    const new_a = newDistance * Math.cos(angleRadians);
+    const new_b = newDistance * Math.sin(angleRadians);
+
+    new_x = routeObj[0].x + (b - new_b);
+    new_y = routeObj[0].y - (a - new_a);
+  }
+
+  // Q2
+  if (routeObj[1].y < routeObj[0].y && routeObj[1].x <= routeObj[0].x) {
+    console.log("Q2");
+    const a = routeObj[0].y - routeObj[1].y;
+    const b = routeObj[0].x - routeObj[1].x;
+    const c = Math.sqrt(a * a + b * b);
+    const newDistance = c - spriteWidth;
+
+    const tangent = b / a;
+    angleRadians = Math.atan(tangent);
+    const new_a = newDistance * Math.cos(angleRadians);
+    const new_b = newDistance * Math.sin(angleRadians);
+
+    new_x = routeObj[0].x - (b - new_b);
+    new_y = routeObj[0].y - (a - new_a);
+  }
+
+  // Q3
+  if (routeObj[1].y >= routeObj[0].y && routeObj[1].x < routeObj[0].x) {
+    console.log("Q3");
+    const a = routeObj[1].y - routeObj[0].y;
+    const b = routeObj[0].x - routeObj[1].x;
+    const c = Math.sqrt(a * a + b * b);
+    const newDistance = c - spriteWidth;
+
+    const tangent = b / a;
+    angleRadians = Math.atan(tangent);
+    const new_a = newDistance * Math.cos(angleRadians);
+    const new_b = newDistance * Math.sin(angleRadians);
+
+    new_x = routeObj[0].x - (b - new_b);
+    new_y = routeObj[0].y + (a - new_a);
+  }
+
+  // Q4
+  if (routeObj[1].y > routeObj[0].y && routeObj[1].x >= routeObj[0].x) {
+    console.log("Q4");
+    const a = routeObj[1].y - routeObj[0].y;
+    const b = routeObj[1].x - routeObj[0].x;
+    const c = Math.sqrt(a * a + b * b);
+    const newDistance = c - spriteWidth;
+
+    const tangent = b / a;
+    angleRadians = Math.atan(tangent);
+    const new_a = newDistance * Math.cos(angleRadians);
+    const new_b = newDistance * Math.sin(angleRadians);
+
+    new_x = routeObj[0].x + (b - new_b);
+    new_y = routeObj[0].y + (a - new_a);
+  }
+
+  new_x = Math.round(new_x * 10) / 10;
+  new_y = Math.round(new_y * 10) / 10;
+
+  //   console.log(new_x);
+  //   console.log(new_y);
+
+  const road = new PIXI.Sprite(spritesheet.textures.road);
+  app.stage.addChild(road);
+  road.position.set(new_x, new_y);
+  road.anchor.set(0.5);
+  //   console.log(angleRadians);
+  //   road.rotation = angleRadians;
+
+  routeObj[0].x = new_x;
+  routeObj[0].y = new_y;
+
+  if (
+    isInRange(routeObj[0].x, routeObj[1].x, spriteWidth) &&
+    isInRange(routeObj[0].y, routeObj[1].y, spriteWidth)
+  ) {
+    console.log("reached!");
+    routeObj.shift();
+    console.log(routeObj);
+  }
+  await drawRoad(routeObj);
+
+  //   await drawRoad(routeObj);
+
+  // this.position.set(this.x, this.y);
+  //   // road.angle = 45;
+
+  // if (
+  //   isInRange(this.x, this.route[1].x, this.speed) &&
+  //   isInRange(this.y, this.route[1].y, this.speed)
+  // ) {
+  //   console.log("reached!");
+  //   this.route.shift();
+  // }
+}
+
+function isInRange(number1, number2, limit) {
+  const lowerLimit = number2 - limit;
+  const upperLimit = number2 + limit;
+  if (number1 >= lowerLimit && number1 <= upperLimit) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
 function checkHitEnemy(bullet, enemies) {
   let hit = false;
   for (let i = 0; i < enemies.length; i++) {
@@ -267,5 +417,3 @@ function checkHitWall(bullet) {
 //     app.stage.addChild(pathTile);
 
 // }
-
-function drawPath(route) {}
