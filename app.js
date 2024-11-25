@@ -2,14 +2,14 @@ const canvasWidth = 700;
 const canvasHeight = 500;
 
 const route = [
-  { x: 0, y: 100 },
-  { x: 550, y: 100 },
-  { x: 550, y: 300 },
-  { x: 250, y: 300 },
-  { x: 250, y: 200 },
-  { x: 100, y: 200 },
-  { x: 100, y: 450 },
-  { x: 700, y: 450 },
+  { x: -64, y: 128 },
+  { x: 576, y: 128 },
+  { x: 576, y: 320 },
+  { x: 256, y: 320 },
+  { x: 256, y: 192 },
+  { x: 128, y: 192 },
+  { x: 128, y: 448 },
+  { x: canvasWidth + 64, y: 448 },
 ];
 
 let bullets = [];
@@ -45,13 +45,13 @@ function run() {
     });
     document.body.appendChild(app.canvas);
 
-    grid(app);
-    coordinates(app, canvasWidth, canvasHeight);
+    grid(app, canvasWidth, canvasHeight);
+
     hudContainer = hud();
 
     let futureRoute = Array.from(route);
-    futureRoute[0].x = -32;
-    await drawRoad(futureRoute);
+    // futureRoute[0].x = -32;
+    await drawRoad(futureRoute, null);
 
     // app.stage.on("pointerdown", (event) => {
     //   const mousePosition = event.data.global;
@@ -173,7 +173,7 @@ function updateTick(deltaTime) {
   }
 }
 
-async function drawRoad(routeObj) {
+async function drawRoad(routeObj, previousDirection) {
   if (routeObj.length === 1) {
     console.log("Hit end");
     return;
@@ -233,6 +233,7 @@ async function drawRoad(routeObj) {
   let new_x;
   let new_y;
   let angleRadians;
+  let currentDirection;
 
   if (routeObj[1].y <= routeObj[0].y && routeObj[1].x > routeObj[0].x) {
     console.log("Q1");
@@ -248,6 +249,8 @@ async function drawRoad(routeObj) {
 
     new_x = routeObj[0].x + (b - new_b);
     new_y = routeObj[0].y - (a - new_a);
+
+    currentDirection  = 
   }
 
   // Q2
@@ -318,12 +321,12 @@ async function drawRoad(routeObj) {
   routeObj[0].y = new_y;
 
   if (
-    isInRange(routeObj[0].x, routeObj[1].x, spriteWidth) &&
-    isInRange(routeObj[0].y, routeObj[1].y, spriteWidth)
+    isInRange(routeObj[0].x, routeObj[1].x, spriteWidth / 2) &&
+    isInRange(routeObj[0].y, routeObj[1].y, spriteWidth / 2)
   ) {
     console.log("reached!");
     routeObj.shift();
-    console.log(routeObj);
+    // console.log(routeObj);
   }
   await drawRoad(routeObj);
 
