@@ -49,6 +49,8 @@ function run() {
 
     hudContainer = hud();
 
+    await grass();
+
     let futureRoute = Array.from(route);
     // futureRoute[0].x = -32;
     await drawRoad(futureRoute, null);
@@ -176,34 +178,44 @@ function updateTick(deltaTime) {
 // async function drawRoad(routeObj, direction) {
 async function drawRoad(routeObj) {
   if (routeObj.length === 1) {
-    console.log("Hit end");
+    // console.log("Hit end");
     return;
   }
 
   const atlasData = {
     frames: {
-      road: {
+      roadH: {
         frame: { x: 128, y: 0, w: 64, h: 64 },
         sourceSize: { w: 64, h: 64 },
         spriteSourceSize: { x: 0, y: 0, w: 64, h: 64 },
       },
-      q1curve: {
-        frame: { x: 64, y: 64, w: 64, h: 64 },
-        sourceSize: { w: 64, h: 64 },
-        spriteSourceSize: { x: 0, y: 0, w: 64, h: 64 },
-      },
-      q2curve: {
-        frame: { x: 0, y: 64, w: 64, h: 64 },
+      roadV: {
+        frame: { x: 192, y: 0, w: 64, h: 64 },
         sourceSize: { w: 64, h: 64 },
         spriteSourceSize: { x: 0, y: 0, w: 64, h: 64 },
       },
       q3curve: {
-        frame: { x: 128, y: 64, w: 64, h: 64 },
+        frame: { x: 64, y: 64, w: 64, h: 64 },
         sourceSize: { w: 64, h: 64 },
         spriteSourceSize: { x: 0, y: 0, w: 64, h: 64 },
       },
       q4curve: {
+        frame: { x: 0, y: 64, w: 64, h: 64 },
+        sourceSize: { w: 64, h: 64 },
+        spriteSourceSize: { x: 0, y: 0, w: 64, h: 64 },
+      },
+      q2curve: {
         frame: { x: 128, y: 64, w: 64, h: 64 },
+        sourceSize: { w: 64, h: 64 },
+        spriteSourceSize: { x: 0, y: 0, w: 64, h: 64 },
+      },
+      q1curve: {
+        frame: { x: 192, y: 64, w: 64, h: 64 },
+        sourceSize: { w: 64, h: 64 },
+        spriteSourceSize: { x: 0, y: 0, w: 64, h: 64 },
+      },
+      grass: {
+        frame: { x: 128, y: 128, w: 64, h: 64 },
         sourceSize: { w: 64, h: 64 },
         spriteSourceSize: { x: 0, y: 0, w: 64, h: 64 },
       },
@@ -224,11 +236,8 @@ async function drawRoad(routeObj) {
 
   let direction;
   let nextDirection;
-  //   let angleRadians;
-  //   let currentDirection;
 
   if (routeObj[1].y <= routeObj[0].y && routeObj[1].x > routeObj[0].x) {
-    console.log("Q1");
     const a = routeObj[0].y - routeObj[1].y;
     const b = routeObj[1].x - routeObj[0].x;
     const c = Math.sqrt(a * a + b * b);
@@ -241,13 +250,9 @@ async function drawRoad(routeObj) {
 
     new_x = routeObj[0].x + (b - new_b);
     new_y = routeObj[0].y - (a - new_a);
-
-    // nextDirection = "top-right";
   }
 
-  // Q2
   if (routeObj[1].y < routeObj[0].y && routeObj[1].x <= routeObj[0].x) {
-    console.log("Q2");
     const a = routeObj[0].y - routeObj[1].y;
     const b = routeObj[0].x - routeObj[1].x;
     const c = Math.sqrt(a * a + b * b);
@@ -260,13 +265,9 @@ async function drawRoad(routeObj) {
 
     new_x = routeObj[0].x - (b - new_b);
     new_y = routeObj[0].y - (a - new_a);
-
-    // nextDirection = "top-left";
   }
 
-  // Q3
   if (routeObj[1].y >= routeObj[0].y && routeObj[1].x < routeObj[0].x) {
-    console.log("Q3");
     const a = routeObj[1].y - routeObj[0].y;
     const b = routeObj[0].x - routeObj[1].x;
     const c = Math.sqrt(a * a + b * b);
@@ -279,13 +280,9 @@ async function drawRoad(routeObj) {
 
     new_x = routeObj[0].x - (b - new_b);
     new_y = routeObj[0].y + (a - new_a);
-
-    // nextDirection = "bottom-left";
   }
 
-  // Q4
   if (routeObj[1].y > routeObj[0].y && routeObj[1].x >= routeObj[0].x) {
-    console.log("Q4");
     const a = routeObj[1].y - routeObj[0].y;
     const b = routeObj[1].x - routeObj[0].x;
     const c = Math.sqrt(a * a + b * b);
@@ -298,43 +295,15 @@ async function drawRoad(routeObj) {
 
     new_x = routeObj[0].x + (b - new_b);
     new_y = routeObj[0].y + (a - new_a);
-
-    // nextDirection = "bottom-right";
   }
-
-  //   if (routeObj[1].y === routeObj[0].y && routeObj[1].x > routeObj[0].x) {
-  //     nextDirection = "right";
-  //   }
-
-  //   if (routeObj[1].y < routeObj[0].y && routeObj[1].x === routeObj[0].x) {
-  //     nextDirection = "top";
-  //   }
-
-  //   if (routeObj[1].y === routeObj[0].y && routeObj[1].x < routeObj[0].x) {
-  //     nextDirection = "left";
-  //   }
-
-  //   if (routeObj[1].y > routeObj[0].y && routeObj[1].x === routeObj[0].x) {
-  //     nextDirection = "bottom";
-  //   }
 
   new_x = Math.round(new_x * 10) / 10;
   new_y = Math.round(new_y * 10) / 10;
 
-  //   console.log(new_x);
-  //   console.log(new_y);
-
-  const road = new PIXI.Sprite(spritesheet.textures.road);
-  app.stage.addChild(road);
-  road.position.set(new_x, new_y);
-  road.anchor.set(0.5);
-  //   console.log(angleRadians);
-  //   road.rotation = angleRadians;
-
-  if (routeObj.length === 1) {
-    console.log("Hit end");
-    return;
-  }
+  //   if (routeObj.length === 1) {
+  //     console.log("Hit end");
+  //     return;
+  //   }
 
   if (routeObj[1].y === routeObj[0].y && routeObj[1].x > routeObj[0].x) {
     direction = "right";
@@ -352,6 +321,19 @@ async function drawRoad(routeObj) {
     direction = "bottom";
   }
 
+  let road;
+  if (direction === "right" || direction === "left") {
+    // console.log("h");
+    road = new PIXI.Sprite(spritesheet.textures.roadH);
+  } else if (direction === "top" || direction === "bottom") {
+    // console.log("v");
+    road = new PIXI.Sprite(spritesheet.textures.roadV);
+  }
+
+  app.stage.addChild(road);
+  road.position.set(new_x, new_y);
+  road.anchor.set(0.5);
+
   routeObj[0].x = new_x;
   routeObj[0].y = new_y;
 
@@ -359,11 +341,11 @@ async function drawRoad(routeObj) {
     isInRange(routeObj[0].x, routeObj[1].x, spriteWidth / 2) &&
     isInRange(routeObj[0].y, routeObj[1].y, spriteWidth / 2)
   ) {
-    console.log("reached!");
+    // console.log("reached!");
     routeObj.shift();
 
     if (routeObj.length === 1) {
-      console.log("Hit end");
+      //   console.log("Hit end");
       return;
     }
 
@@ -382,82 +364,47 @@ async function drawRoad(routeObj) {
     if (routeObj[1].y > routeObj[0].y && routeObj[1].x === routeObj[0].x) {
       nextDirection = "bottom";
     }
-    // if (direction !== nextDirection) {
-    //   // changing direction here
-    //   switch (nextDirection) {
-    //     // case "top-right":
-    //     //   console.log("top-right");
-    //     //   break;
-    //     // case "top-left":
-    //     //   console.log("top-left");
-    //     //   break;
-    //     // case "bottom-left":
-    //     //   console.log("bottom-left");
-    //     //   break;
-    //     // case "bottom-right":
-    //     //   console.log("bottom-right");
-    //     //   break;
-    //     // case "left" || "right":
-    //     //   console.log("left or right");
-    //     //   break;
-    //     // case "top" || "bottom":
-    //     //   console.log("top or bottom");
-    //     //   break;
-    //     default:
-    //       console.log(nextDirection);
-    //       break;
-    //   }
 
+    let curve;
     if (direction === "right" && nextDirection === "bottom") {
       console.log("go down from left");
+      curve = new PIXI.Sprite(spritesheet.textures.q3curve);
     }
     if (direction === "right" && nextDirection === "top") {
       console.log("go top from left");
+      curve = new PIXI.Sprite(spritesheet.textures.q2curve);
     }
     if (direction === "left" && nextDirection === "bottom") {
       console.log("go down from right");
+      curve = new PIXI.Sprite(spritesheet.textures.q4curve);
     }
     if (direction === "left" && nextDirection === "top") {
       console.log("go top from right");
+      curve = new PIXI.Sprite(spritesheet.textures.q1curve);
     }
 
     if (direction === "bottom" && nextDirection === "left") {
       console.log("go left from top");
+      curve = new PIXI.Sprite(spritesheet.textures.q2curve);
     }
     if (direction === "bottom" && nextDirection === "right") {
       console.log("go right from top");
+      curve = new PIXI.Sprite(spritesheet.textures.q1curve);
     }
     if (direction === "top" && nextDirection === "left") {
       console.log("go left from bottom");
+      curve = new PIXI.Sprite(spritesheet.textures.q3curve);
     }
     if (direction === "top" && nextDirection === "right") {
       console.log("go right from bottom");
+      curve = new PIXI.Sprite(spritesheet.textures.q4curve);
     }
 
-    //   const road = new PIXI.Sprite(spritesheet.textures.road);
-    //   app.stage.addChild(road);
-    //   road.position.set(new_x, new_y);
-    //   road.anchor.set(0.5);
+    app.stage.addChild(curve);
+    curve.position.set(new_x, new_y);
+    curve.anchor.set(0.5);
   }
-
-  //   console.log(nextDirection);
-  //   direction = nextDirection;
-
   await drawRoad(routeObj);
-  //   await drawRoad(routeObj, direction);
-
-  //   await drawRoad(routeObj);
-
-  // this.position.set(this.x, this.y);
-  //   // road.angle = 45;
-
-  // if (
-  //   isInRange(this.x, this.route[1].x, this.speed) &&
-  //   isInRange(this.y, this.route[1].y, this.speed)
-  // ) {
-  //   console.log("reached!");
-  //   this.route.shift();
-  // }
 }
 
 function isInRange(number1, number2, limit) {
