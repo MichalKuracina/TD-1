@@ -173,7 +173,8 @@ function updateTick(deltaTime) {
   }
 }
 
-async function drawRoad(routeObj, previousDirection) {
+// async function drawRoad(routeObj, direction) {
+async function drawRoad(routeObj) {
   if (routeObj.length === 1) {
     console.log("Hit end");
     return;
@@ -217,23 +218,14 @@ async function drawRoad(routeObj, previousDirection) {
   const spritesheet = new PIXI.Spritesheet(texture, atlasData);
   await spritesheet.parse();
 
-  //   [
-  //     { x: 0, y: 100 },
-  //     { x: 500, y: 100 },
-  //     { x: 550, y: 150 },
-  //     { x: 500, y: 200 },
-  //     { x: 200, y: 200 },
-  //     { x: 100, y: 300 },
-  //     { x: 150, y: 350 },
-  //     { x: 500, y: 400 },
-  //     { x: 500, y: 500 },
-  //   ];
-
   const spriteWidth = 64;
   let new_x;
   let new_y;
-  let angleRadians;
-  let currentDirection;
+
+  let direction;
+  let nextDirection;
+  //   let angleRadians;
+  //   let currentDirection;
 
   if (routeObj[1].y <= routeObj[0].y && routeObj[1].x > routeObj[0].x) {
     console.log("Q1");
@@ -243,14 +235,14 @@ async function drawRoad(routeObj, previousDirection) {
     const newDistance = c - spriteWidth;
 
     const tangent = b / a;
-    angleRadians = Math.atan(tangent);
+    const angleRadians = Math.atan(tangent);
     const new_a = newDistance * Math.cos(angleRadians);
     const new_b = newDistance * Math.sin(angleRadians);
 
     new_x = routeObj[0].x + (b - new_b);
     new_y = routeObj[0].y - (a - new_a);
 
-    currentDirection  = 
+    // nextDirection = "top-right";
   }
 
   // Q2
@@ -262,12 +254,14 @@ async function drawRoad(routeObj, previousDirection) {
     const newDistance = c - spriteWidth;
 
     const tangent = b / a;
-    angleRadians = Math.atan(tangent);
+    const angleRadians = Math.atan(tangent);
     const new_a = newDistance * Math.cos(angleRadians);
     const new_b = newDistance * Math.sin(angleRadians);
 
     new_x = routeObj[0].x - (b - new_b);
     new_y = routeObj[0].y - (a - new_a);
+
+    // nextDirection = "top-left";
   }
 
   // Q3
@@ -279,12 +273,14 @@ async function drawRoad(routeObj, previousDirection) {
     const newDistance = c - spriteWidth;
 
     const tangent = b / a;
-    angleRadians = Math.atan(tangent);
+    const angleRadians = Math.atan(tangent);
     const new_a = newDistance * Math.cos(angleRadians);
     const new_b = newDistance * Math.sin(angleRadians);
 
     new_x = routeObj[0].x - (b - new_b);
     new_y = routeObj[0].y + (a - new_a);
+
+    // nextDirection = "bottom-left";
   }
 
   // Q4
@@ -296,13 +292,31 @@ async function drawRoad(routeObj, previousDirection) {
     const newDistance = c - spriteWidth;
 
     const tangent = b / a;
-    angleRadians = Math.atan(tangent);
+    const angleRadians = Math.atan(tangent);
     const new_a = newDistance * Math.cos(angleRadians);
     const new_b = newDistance * Math.sin(angleRadians);
 
     new_x = routeObj[0].x + (b - new_b);
     new_y = routeObj[0].y + (a - new_a);
+
+    // nextDirection = "bottom-right";
   }
+
+  //   if (routeObj[1].y === routeObj[0].y && routeObj[1].x > routeObj[0].x) {
+  //     nextDirection = "right";
+  //   }
+
+  //   if (routeObj[1].y < routeObj[0].y && routeObj[1].x === routeObj[0].x) {
+  //     nextDirection = "top";
+  //   }
+
+  //   if (routeObj[1].y === routeObj[0].y && routeObj[1].x < routeObj[0].x) {
+  //     nextDirection = "left";
+  //   }
+
+  //   if (routeObj[1].y > routeObj[0].y && routeObj[1].x === routeObj[0].x) {
+  //     nextDirection = "bottom";
+  //   }
 
   new_x = Math.round(new_x * 10) / 10;
   new_y = Math.round(new_y * 10) / 10;
@@ -317,6 +331,27 @@ async function drawRoad(routeObj, previousDirection) {
   //   console.log(angleRadians);
   //   road.rotation = angleRadians;
 
+  if (routeObj.length === 1) {
+    console.log("Hit end");
+    return;
+  }
+
+  if (routeObj[1].y === routeObj[0].y && routeObj[1].x > routeObj[0].x) {
+    direction = "right";
+  }
+
+  if (routeObj[1].y < routeObj[0].y && routeObj[1].x === routeObj[0].x) {
+    direction = "top";
+  }
+
+  if (routeObj[1].y === routeObj[0].y && routeObj[1].x < routeObj[0].x) {
+    direction = "left";
+  }
+
+  if (routeObj[1].y > routeObj[0].y && routeObj[1].x === routeObj[0].x) {
+    direction = "bottom";
+  }
+
   routeObj[0].x = new_x;
   routeObj[0].y = new_y;
 
@@ -326,9 +361,90 @@ async function drawRoad(routeObj, previousDirection) {
   ) {
     console.log("reached!");
     routeObj.shift();
-    // console.log(routeObj);
+
+    if (routeObj.length === 1) {
+      console.log("Hit end");
+      return;
+    }
+
+    if (routeObj[1].y === routeObj[0].y && routeObj[1].x > routeObj[0].x) {
+      nextDirection = "right";
+    }
+
+    if (routeObj[1].y < routeObj[0].y && routeObj[1].x === routeObj[0].x) {
+      nextDirection = "top";
+    }
+
+    if (routeObj[1].y === routeObj[0].y && routeObj[1].x < routeObj[0].x) {
+      nextDirection = "left";
+    }
+
+    if (routeObj[1].y > routeObj[0].y && routeObj[1].x === routeObj[0].x) {
+      nextDirection = "bottom";
+    }
+    // if (direction !== nextDirection) {
+    //   // changing direction here
+    //   switch (nextDirection) {
+    //     // case "top-right":
+    //     //   console.log("top-right");
+    //     //   break;
+    //     // case "top-left":
+    //     //   console.log("top-left");
+    //     //   break;
+    //     // case "bottom-left":
+    //     //   console.log("bottom-left");
+    //     //   break;
+    //     // case "bottom-right":
+    //     //   console.log("bottom-right");
+    //     //   break;
+    //     // case "left" || "right":
+    //     //   console.log("left or right");
+    //     //   break;
+    //     // case "top" || "bottom":
+    //     //   console.log("top or bottom");
+    //     //   break;
+    //     default:
+    //       console.log(nextDirection);
+    //       break;
+    //   }
+
+    if (direction === "right" && nextDirection === "bottom") {
+      console.log("go down from left");
+    }
+    if (direction === "right" && nextDirection === "top") {
+      console.log("go top from left");
+    }
+    if (direction === "left" && nextDirection === "bottom") {
+      console.log("go down from right");
+    }
+    if (direction === "left" && nextDirection === "top") {
+      console.log("go top from right");
+    }
+
+    if (direction === "bottom" && nextDirection === "left") {
+      console.log("go left from top");
+    }
+    if (direction === "bottom" && nextDirection === "right") {
+      console.log("go right from top");
+    }
+    if (direction === "top" && nextDirection === "left") {
+      console.log("go left from bottom");
+    }
+    if (direction === "top" && nextDirection === "right") {
+      console.log("go right from bottom");
+    }
+
+    //   const road = new PIXI.Sprite(spritesheet.textures.road);
+    //   app.stage.addChild(road);
+    //   road.position.set(new_x, new_y);
+    //   road.anchor.set(0.5);
   }
+
+  //   console.log(nextDirection);
+  //   direction = nextDirection;
+
   await drawRoad(routeObj);
+  //   await drawRoad(routeObj, direction);
 
   //   await drawRoad(routeObj);
 
