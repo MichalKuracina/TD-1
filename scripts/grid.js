@@ -1,4 +1,4 @@
-function grid(app) {
+function grid() {
   const line = new PIXI.Graphics();
   app.stage.addChild(line);
 
@@ -45,5 +45,5 @@ function grid(app) {
 
   line.stroke({ width: 1, color: 0xfc0303, alpha: 0.2 });
 
-  coordinates(app, canvasWidth, canvasHeight);
+  //   coordinates(app, canvasWidth, canvasHeight);
 }
