@@ -17,6 +17,7 @@ let turrets = [];
 let enemies = [];
 
 let app;
+let paneObj;
 let bullet;
 let elapsed = 0;
 const interval = 1000;
@@ -48,11 +49,10 @@ function run() {
     await grass();
     await path(Array.from(route));
 
-    grid();
     hudContainer = hud();
 
-    let pp = new Pane();
-
+    paneObj = new Pane();
+    grid();
     // await pp.drawPane();
 
     // app.stage.on("pointermove", (event) => {
