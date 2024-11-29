@@ -50,8 +50,10 @@ function run() {
     await path(Array.from(route));
 
     hudContainer = hud();
-
+    // const hoverIcon = "assets/hand_thin_point.png";
+    // app.renderer.events.cursorStyles.hover = hoverIcon;
     paneObj = new Pane();
+
     grid();
     // await pp.drawPane();
 

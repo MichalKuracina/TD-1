@@ -45,5 +45,5 @@ function grid() {
 
   line.stroke({ width: 1, color: 0xfc0303, alpha: 0.2 });
 
-  coordinates(app, canvasWidth, canvasHeight);
+  //   coordinates(app, canvasWidth, canvasHeight);
 }
