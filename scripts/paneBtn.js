@@ -1,54 +1,84 @@
 class PaneBtn extends PIXI.Graphics {
-  constructor(label) {
+  constructor(label, x, y, gold, price) {
     super();
     this.label = label;
-    // this.container = null;
+    this.x = x;
+    this.y = y;
+    this.gold = gold;
+    this.price = price;
+    this.sprite = null;
 
-    this.drawButton();
+    this.initializeButton();
   }
 
-  async drawButton() {
-    const atlasData = {
-      frames: {
-        standard: {
-          frame: { x: 0, y: 0, w: 64, h: 64 },
-          sourceSize: { w: 64, h: 64 },
-          spriteSourceSize: { x: 0, y: 0, w: 64, h: 64 },
-        },
-        type2: {
-          frame: { x: 64, y: 0, w: 64, h: 64 },
-          sourceSize: { w: 64, h: 64 },
-          spriteSourceSize: { x: 0, y: 0, w: 64, h: 64 },
-        },
-        type3: {
-          frame: { x: 128, y: 0, w: 64, h: 64 },
-          sourceSize: { w: 64, h: 64 },
-          spriteSourceSize: { x: 0, y: 0, w: 64, h: 64 },
-        },
-        coin: {
-          frame: { x: 192, y: 0, w: 64, h: 64 },
-          sourceSize: { w: 64, h: 64 },
-          spriteSourceSize: { x: 0, y: 0, w: 64, h: 64 },
-        },
-      },
-      meta: {
-        image: "/assets/spritesheet3.png",
-        size: { w: 256, h: 64 },
-      },
-    };
-
-    // this.container = new PIXI.Container();
-    // this.container.label = this.label;
-
-    const texture = await PIXI.Assets.load(atlasData.meta.image);
-    const spritesheet = new PIXI.Spritesheet(texture, atlasData);
+  async initializeButton() {
+    // Button
+    const texture = await PIXI.Assets.load(paneSprites.meta.image);
+    const spritesheet = new PIXI.Spritesheet(texture, paneSprites);
     await spritesheet.parse();
+    this.sprite = new PIXI.Sprite(spritesheet.textures[this.label]);
+    paneObj.paneContainer.addChild(this.sprite);
 
-    // const sprite = new PIXI.Sprite(spritesheet.textures.standard);
+    this.sprite.position.set(this.x, this.y);
+    this.sprite.anchor.set(0.5);
 
-    const sprite = new PIXI.Sprite(spritesheet.textures[this.label]);
-    paneObj.paneContainer.addChild(sprite);
+    if (this.gold >= this.price) {
+      this.sprite.alpha = 1;
+      this.sprite.eventMode = "static";
+    } else {
+      this.sprite.alpha = 0.5;
+      this.sprite.eventMode = "none";
+    }
+    // console.log(this.sprite.isInteractive());
 
-    sprite.position.set(0, 0);
+    // Price Tag
+    const labelBorder = new PIXI.Graphics();
+    labelBorder.roundRect(this.x, this.y + 10, 25, 20, 4);
+    labelBorder.fill(0xeb3440);
+    paneObj.paneContainer.addChild(labelBorder);
+
+    labelBorder.roundRect(this.x + 2, this.y + 12, 21, 16, 3);
+    labelBorder.fill(0xfaf7f8);
+    paneObj.paneContainer.addChild(labelBorder);
+
+    const labelText = new PIXI.BitmapText({
+      text: `${this.price}€`,
+      style: {
+        fontSize: 10,
+        align: "left",
+        fill: 0xfc0303,
+      },
+    });
+
+    labelText.x = this.x + 4;
+    labelText.y = this.y + 14;
+
+    paneObj.paneContainer.addChild(labelText);
+
+    this.sprite.on("mouseover", (event) => {
+      if (this.sprite.isInteractive()) {
+        this.sprite.cursor = "pointer";
+      }
+    });
+    // this.sprite.onpointerdown = (event) => {
+    //   console.log("down");
+    // };
+    // this.sprite.onpointerup = (event) => {
+    //   console.log("up");
+    // };
+  }
+
+  addGold(amount) {
+    this.gold = this.gold + amount;
+    if (this.gold > 999) {
+      this.gold = 999;
+    }
+  }
+
+  substractGold(amount) {
+    this.gold = this.gold - amount;
+    if (this.gold < 0) {
+      this.gold = 0;
+    }
   }
 }

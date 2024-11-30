@@ -50,9 +50,26 @@ function run() {
     await path(Array.from(route));
 
     hudContainer = hud();
-    // const hoverIcon = "assets/hand_thin_point.png";
-    // app.renderer.events.cursorStyles.hover = hoverIcon;
+
     paneObj = new Pane();
+    // console.log(paneObj.paneContainer.getChildByLabel("standard").label);
+    paneObj.paneContainer.getChildByLabel("standard").onpointerdown = (
+      event
+    ) => {
+      console.log("down");
+    };
+
+    // paneObj.on("pointerdown", (event) => {
+    //   const mousePosition = event.data.global;
+    //   console.log(mousePosition);
+    // });
+
+    // paneObj.paneContainer.getChildByLabel("standard").onpointerdown = (
+    //   event
+    // ) => {
+    //   //some function here that happens on pointerdown
+    //   console.log("ss");
+    // };
 
     grid();
     // await pp.drawPane();
