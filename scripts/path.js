@@ -3,6 +3,7 @@ async function path(routeObj) {
   //     return;
   //   }
 
+  //   console.log(routeObj);
   const atlasData = {
     frames: {
       roadH: {

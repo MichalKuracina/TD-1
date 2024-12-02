@@ -23,10 +23,12 @@ class PaneBtn extends PIXI.Graphics {
     this.sprite.anchor.set(0.5);
 
     if (this.gold >= this.price) {
-      this.sprite.alpha = 1;
+      //   this.sprite.alpha = 1;
+      //   this.sprite.tint = 0x9c9a95;
       this.sprite.eventMode = "static";
     } else {
-      this.sprite.alpha = 0.5;
+      //   this.sprite.alpha = 0.5;
+      this.sprite.tint = 0x9c9a95;
       this.sprite.eventMode = "none";
     }
     // console.log(this.sprite.isInteractive());
@@ -55,17 +57,37 @@ class PaneBtn extends PIXI.Graphics {
 
     paneObj.paneContainer.addChild(labelText);
 
-    this.sprite.on("mouseover", (event) => {
-      if (this.sprite.isInteractive()) {
-        this.sprite.cursor = "pointer";
-      }
-    });
-    // this.sprite.onpointerdown = (event) => {
-    //   console.log("down");
-    // };
-    // this.sprite.onpointerup = (event) => {
-    //   console.log("up");
-    // };
+    // this.sprite.on("mouseover", (event) => {
+    //   if (this.sprite.isInteractive()) {
+    //     this.sprite.cursor = "pointer";
+    //   }
+    // });
+
+    // this.sprite.cursor = "pointer";
+    // this.sprite.on("pointerdown", onDragStart, this.sprite);
+    // let dragTarget = null;
+    // app.stage.on("pointerup", onDragEnd);
+    // app.stage.on("pointerupoutside", onDragEnd);
+
+    // function onDragMove(event) {
+    //   if (dragTarget) {
+    //     dragTarget.parent.toLocal(event.global, null, dragTarget.position);
+    //   }
+    // }
+
+    // function onDragStart() {
+    //   this.alpha = 0.5;
+    //   dragTarget = this;
+    //   app.stage.on("pointermove", onDragMove);
+    // }
+
+    // function onDragEnd() {
+    //   if (dragTarget) {
+    //     app.stage.off("pointermove", onDragMove);
+    //     dragTarget.alpha = 1;
+    //     dragTarget = null;
+    //   }
+    // }
   }
 
   addGold(amount) {
