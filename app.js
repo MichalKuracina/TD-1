@@ -24,7 +24,7 @@ const shootInterval = 1000;
 
 const spawnInterval = 1000;
 let spawnElapsed = 0;
-const spawnLimit = 0;
+const spawnLimit = 10;
 let spawnCounter = 0;
 
 let towerCount = 0;
@@ -54,7 +54,7 @@ function run() {
     app.stage.eventMode = "static";
     app.stage.hitArea = app.screen;
 
-    turret = new Tower(128, 64);
+    turret = new Tower(384, 192);
     await turret.initTower();
     turrets.push(turret);
     // app.stage.addChild(turret);
@@ -67,12 +67,16 @@ function run() {
     // app.stage.addChild(bullet);
     // bullets.push(bullet);
 
-    const enemy = new Enemy(192, 70, 10, 0xfc0303, 1000, 1000, 0, [
-      { x: 192, y: 64 },
-      { x: 576, y: 64 },
-    ]);
-    app.stage.addChild(enemy);
-    enemies.push(enemy);
+    // const enemy = new Enemy(256, 0, 10, 0xfc0303, 1000, 1000, 0, [
+    //   { x: 128, y: 128 },
+    //   { x: 576, y: 64 },
+    // ]);
+    // app.stage.addChild(enemy);
+    // enemies.push(enemy);
+
+    // app.stage.addEventListener("pointermove", (e) => {
+    //   turrets[0].rotateTower(e.global.x, e.global.y);
+    // });
 
     app.ticker.add(updateTick);
   })();
@@ -98,7 +102,7 @@ function updateTick(deltaTime) {
         0xfc0303,
         5,
         5,
-        1,
+        0.5,
         structuredClone(route)
         // Array.from(route)
       );
@@ -127,8 +131,8 @@ function updateTick(deltaTime) {
     for (let i = 0; i < turrets.length; i++) {
       const closesE = turrets[i].getClosesEnemy(enemies);
 
-      //   turrets[i].rotateTower(closesE.x, closesE.y);
-      turrets[i].rotateTower(closesE);
+      turrets[i].rotateTower(closesE.x, closesE.y);
+      //   turrets[i].rotateTower(closesE);
     }
   }
 

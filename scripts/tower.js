@@ -36,14 +36,15 @@ class Tower extends PIXI.Graphics {
     this.sprite.anchor.set(0.5);
   }
 
-  //   rotateTower(x, y) {
-  rotateTower(enemy) {
+  rotateTower(x, y) {
+    //   rotateTower(enemy) {
     // if (y <= this.y && x > this.x) {
     //   //   console.log("Q1");
     //   const a = this.y - y;
     //   const b = x - this.x;
     //   const tangent = b / a;
     //   this.sprite.rotation = Math.atan(tangent);
+    //   //   this.sprite.rotation = Math.atan2(y, x) + 1;
     // }
     // // Q2
     // if (y < this.y && x <= this.x) {
@@ -52,6 +53,7 @@ class Tower extends PIXI.Graphics {
     //   const b = this.x - x;
     //   const tangent = b / a;
     //   this.sprite.rotation = Math.atan(tangent);
+    //   //   this.sprite.rotation = Math.atan2(y, x) + 5.5;
     // }
     // // Q3
     // if (y >= this.y && x < this.x) {
@@ -60,6 +62,7 @@ class Tower extends PIXI.Graphics {
     //   const b = this.x - x;
     //   const tangent = b / a;
     //   this.sprite.rotation = Math.atan(tangent);
+    //   //   this.sprite.rotation = Math.atan2(y, x) + 2.5;
     // }
     // // Q4
     // if (y > this.y && x >= this.x) {
@@ -67,16 +70,20 @@ class Tower extends PIXI.Graphics {
     //   const a = y - this.y;
     //   const b = x - this.x;
     //   const tangent = b / a;
-    //   this.sprite.rotation = Math.atan2(tangent);
+    //   this.sprite.rotation = Math.atan(tangent);
+    //   //   this.sprite.rotation = Math.atan2(tangent);
+    //   //   this.sprite.rotation = Math.atan2(y, x) + 1.6;
     // }
     // this.sprite.rotation = Math.atan2(y, x) + 1.45;
     // console.log(this.sprite);
-
-    // this.sprite.rotation = Math.atan2(y, x) + 1.7;
-
-    this.sprite.rotation = 0;
-    const p = this.sprite.toLocal(enemy);
-    this.sprite.rotation = Math.atan2(p.y, p.x);
+    // console.log(Math.atan2(y, x));
+    // this.sprite.rotation = Math.atan2(y, x);
+    const dx = x - this.sprite.x;
+    const dy = y - this.sprite.y;
+    const angle = Math.atan2(dy, dx);
+    const rotationOffset = Math.PI / 2;
+    // Rotate the sprite to face the mouse
+    this.sprite.rotation = angle + rotationOffset;
   }
 
   shoot(enemy) {
