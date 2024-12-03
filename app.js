@@ -24,7 +24,7 @@ const shootInterval = 1000;
 
 const spawnInterval = 1000;
 let spawnElapsed = 0;
-const spawnLimit = 10;
+const spawnLimit = 0;
 let spawnCounter = 0;
 
 let towerCount = 0;
@@ -54,9 +54,18 @@ function run() {
     app.stage.eventMode = "static";
     app.stage.hitArea = app.screen;
 
-    turret = new Tower(384, 192);
-    await turret.initTower();
+    turret = new Tower(320, 192, "standard");
+    // await turret.initTower();
     turrets.push(turret);
+
+    turret = new Tower(384, 192, "splash");
+    // await turret.initTower();
+    turrets.push(turret);
+
+    turret = new Tower(448, 192, "slow");
+    // await turret.initTower();
+    turrets.push(turret);
+
     // app.stage.addChild(turret);
     // console.log(turrets);
     // turret = new Turret(200, 300, 10, 0x0f03fc);
@@ -67,12 +76,26 @@ function run() {
     // app.stage.addChild(bullet);
     // bullets.push(bullet);
 
-    // const enemy = new Enemy(256, 0, 10, 0xfc0303, 1000, 1000, 0, [
-    //   { x: 128, y: 128 },
-    //   { x: 576, y: 64 },
-    // ]);
-    // app.stage.addChild(enemy);
-    // enemies.push(enemy);
+    let enemy = new Enemy(320, 64, 10, 0xfc0303, 1000, 1000, 0, [
+      { x: 128, y: 128 },
+      { x: 576, y: 64 },
+    ]);
+    app.stage.addChild(enemy);
+    enemies.push(enemy);
+
+    enemy = new Enemy(384, 64, 10, 0xfc0303, 1000, 1000, 0, [
+      { x: 128, y: 128 },
+      { x: 576, y: 64 },
+    ]);
+    app.stage.addChild(enemy);
+    enemies.push(enemy);
+
+    enemy = new Enemy(448, 64, 10, 0xfc0303, 1000, 1000, 0, [
+      { x: 128, y: 128 },
+      { x: 576, y: 64 },
+    ]);
+    app.stage.addChild(enemy);
+    enemies.push(enemy);
 
     // app.stage.addEventListener("pointermove", (e) => {
     //   turrets[0].rotateTower(e.global.x, e.global.y);
@@ -126,31 +149,52 @@ function updateTick(deltaTime) {
     }
   }
 
-  // Rotate Tower
-  if (enemies.length > 0) {
-    for (let i = 0; i < turrets.length; i++) {
-      const closesE = turrets[i].getClosesEnemy(enemies);
+  //   // Rotate
+  //   if (enemies.length > 0) {
+  //     for (let i = 0; i < turrets.length; i++) {
+  //       const closesE = turrets[i].getClosesEnemy(enemies);
 
-      turrets[i].rotateTower(closesE.x, closesE.y);
-      //   turrets[i].rotateTower(closesE);
-    }
+  //       turrets[i].rotateTower(closesE.x, closesE.y);
+  //     }
+  //   }
+
+  let bullet = null;
+  bullet = turrets[0].shoot2(enemies[0], deltaTime.deltaMS);
+  if (bullet) {
+    bullet.damage = turrets[0].damage;
+    app.stage.addChild(bullet);
+    bullets.push(bullet);
   }
 
-  if (shootElapsed >= shootInterval) {
-    shootElapsed = 0;
-    if (enemies.length > 0) {
-      for (let i = 0; i < turrets.length; i++) {
-        const closesEnemy = turrets[i].getClosesEnemy(enemies);
-
-        const bullet = turrets[i].shoot(closesEnemy);
-
-        bullet.damage = turrets[i].damage;
-        app.stage.addChild(bullet);
-        bullets.push(bullet);
-      }
-      //   console.log("s");
-    }
+  bullet = turrets[1].shoot2(enemies[1], deltaTime.deltaMS);
+  if (bullet) {
+    bullet.damage = turrets[1].damage;
+    app.stage.addChild(bullet);
+    bullets.push(bullet);
   }
+
+  bullet = turrets[2].shoot2(enemies[2], deltaTime.deltaMS);
+  if (bullet) {
+    bullet.damage = turrets[2].damage;
+    app.stage.addChild(bullet);
+    bullets.push(bullet);
+  }
+
+  //   if (shootElapsed >= shootInterval) {
+  //     shootElapsed = 0;
+  //     if (enemies.length > 0) {
+  //       for (let i = 0; i < turrets.length; i++) {
+  //         const closesEnemy = turrets[i].getClosesEnemy(enemies);
+
+  //         const bullet = turrets[i].shoot(closesEnemy);
+
+  //         bullet.damage = turrets[i].damage;
+  //         app.stage.addChild(bullet);
+  //         bullets.push(bullet);
+  //       }
+  //       //   console.log("s");
+  //     }
+  //   }
 
   for (let i = 0; i < bullets.length; i++) {
     bullets[i].move();

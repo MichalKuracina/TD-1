@@ -1,31 +1,54 @@
 class Tower extends PIXI.Graphics {
-  constructor(
-    x = 0,
-    y = 0,
-    type = "standard",
-    // radius = 10,
-    // color = 0x0f03fc,
-    damage = 1,
-    speed = 1
-  ) {
+  constructor(x = 0, y = 0, type = "standard") {
     super();
     this.x = x;
     this.y = y;
     this.type = type;
-    // this.radius = radius;
-    // this.color = color;
-    this.damage = damage;
-    this.speed = speed;
-
+    this.damage = 1;
+    this.speed = 1000;
+    this.radius = 100;
+    this.effect = "none";
     this.bullet_radius = 5;
     this.bullet_color = 0xf4fc03;
+    this.bullet_speed = 1;
+    this.shotTimeElapsed = 0;
 
-    // this.initTower();
+    this.initTower();
   }
 
   async initTower() {
-    // this.circle(0, 0, this.radius);
-    // this.fill(this.color);
+    switch (this.type) {
+      case "splash":
+        this.damage = 3;
+        this.speed = 2000;
+        this.radius = 300;
+        this.effect = "splash";
+        this.bullet_radius = 5;
+        this.bullet_color = 0x996863;
+        this.bullet_speed = 1;
+        break;
+
+      case "slow":
+        this.damage = 2;
+        this.speed = 3000;
+        this.radius = 200;
+        this.effect = "slow";
+        this.bullet_radius = 7;
+        this.bullet_color = 0x85b4f2;
+        this.bullet_speed = 1;
+        break;
+
+      default: // "standard"
+        this.damage = 1;
+        this.speed = 1000;
+        this.radius = 400;
+        this.effect = "none";
+        this.bullet_radius = 3.5;
+        this.bullet_color = 0x56a843;
+        this.bullet_speed = 1;
+        break;
+    }
+
     const texture = await PIXI.Assets.load(paneSprites.meta.image);
     const spritesheet = new PIXI.Spritesheet(texture, paneSprites);
     await spritesheet.parse();
@@ -34,55 +57,32 @@ class Tower extends PIXI.Graphics {
 
     this.sprite.position.set(this.x, this.y);
     this.sprite.anchor.set(0.5);
+    this.sprite.label = this.type;
+
+    // this.sprite.on("pointerover", (event) => {
+    //   console.log(event);
+    // });
+    // this.sprite.eventMode = "static";
+    let detail = new TowerDetail(
+      this.x,
+      this.y,
+      this.type,
+      this.damage,
+      this.speed,
+      this.radius,
+      this.effect,
+      this.bullet_color
+    );
+    // app.stage.addChild(detail);
+    // app.stage.removeChild(detail);
+    // detail.destroy();
   }
 
   rotateTower(x, y) {
-    //   rotateTower(enemy) {
-    // if (y <= this.y && x > this.x) {
-    //   //   console.log("Q1");
-    //   const a = this.y - y;
-    //   const b = x - this.x;
-    //   const tangent = b / a;
-    //   this.sprite.rotation = Math.atan(tangent);
-    //   //   this.sprite.rotation = Math.atan2(y, x) + 1;
-    // }
-    // // Q2
-    // if (y < this.y && x <= this.x) {
-    //   //   console.log("Q2");
-    //   const a = this.y - y;
-    //   const b = this.x - x;
-    //   const tangent = b / a;
-    //   this.sprite.rotation = Math.atan(tangent);
-    //   //   this.sprite.rotation = Math.atan2(y, x) + 5.5;
-    // }
-    // // Q3
-    // if (y >= this.y && x < this.x) {
-    //   //   console.log("Q3");
-    //   const a = y - this.y;
-    //   const b = this.x - x;
-    //   const tangent = b / a;
-    //   this.sprite.rotation = Math.atan(tangent);
-    //   //   this.sprite.rotation = Math.atan2(y, x) + 2.5;
-    // }
-    // // Q4
-    // if (y > this.y && x >= this.x) {
-    //   //   console.log("Q4");
-    //   const a = y - this.y;
-    //   const b = x - this.x;
-    //   const tangent = b / a;
-    //   this.sprite.rotation = Math.atan(tangent);
-    //   //   this.sprite.rotation = Math.atan2(tangent);
-    //   //   this.sprite.rotation = Math.atan2(y, x) + 1.6;
-    // }
-    // this.sprite.rotation = Math.atan2(y, x) + 1.45;
-    // console.log(this.sprite);
-    // console.log(Math.atan2(y, x));
-    // this.sprite.rotation = Math.atan2(y, x);
     const dx = x - this.sprite.x;
     const dy = y - this.sprite.y;
     const angle = Math.atan2(dy, dx);
     const rotationOffset = Math.PI / 2;
-    // Rotate the sprite to face the mouse
     this.sprite.rotation = angle + rotationOffset;
   }
 
@@ -96,11 +96,33 @@ class Tower extends PIXI.Graphics {
       this.y,
       enemy_x,
       enemy_y,
-      this.speed,
+      this.bullet_speed,
       this.bullet_radius,
       this.bullet_color,
       this.damage
     );
+  }
+
+  shoot2(enemy, deltaMS) {
+    this.shotTimeElapsed += deltaMS;
+
+    if (this.shotTimeElapsed >= this.speed) {
+      this.shotTimeElapsed = 0;
+      const enemy_x = enemy.x;
+      const enemy_y = enemy.y;
+      return new Bullet(
+        this.x,
+        this.y,
+        this.x,
+        this.y,
+        enemy_x,
+        enemy_y,
+        this.bullet_speed,
+        this.bullet_radius,
+        this.bullet_color,
+        this.damage
+      );
+    }
   }
 
   getClosesEnemy(enemies) {
