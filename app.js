@@ -200,7 +200,7 @@ function updateTick(deltaTime) {
     bullets[i].move();
 
     if (checkHitEnemy(bullets[i], enemies)) {
-      console.log("Hit!");
+      //   console.log("Hit!");
 
       bullets.splice(i, 1);
       i--;

@@ -12,6 +12,8 @@ class Tower extends PIXI.Graphics {
     this.bullet_color = 0xf4fc03;
     this.bullet_speed = 1;
     this.shotTimeElapsed = 0;
+    this.detailTooltip = null;
+    this.detailRadius = null;
 
     this.initTower();
   }
@@ -21,7 +23,7 @@ class Tower extends PIXI.Graphics {
       case "splash":
         this.damage = 3;
         this.speed = 2000;
-        this.radius = 300;
+        this.radius = 200;
         this.effect = "splash";
         this.bullet_radius = 5;
         this.bullet_color = 0x996863;
@@ -31,7 +33,7 @@ class Tower extends PIXI.Graphics {
       case "slow":
         this.damage = 2;
         this.speed = 3000;
-        this.radius = 200;
+        this.radius = 100;
         this.effect = "slow";
         this.bullet_radius = 7;
         this.bullet_color = 0x85b4f2;
@@ -41,7 +43,7 @@ class Tower extends PIXI.Graphics {
       default: // "standard"
         this.damage = 1;
         this.speed = 1000;
-        this.radius = 400;
+        this.radius = 300;
         this.effect = "none";
         this.bullet_radius = 3.5;
         this.bullet_color = 0x56a843;
@@ -58,24 +60,37 @@ class Tower extends PIXI.Graphics {
     this.sprite.position.set(this.x, this.y);
     this.sprite.anchor.set(0.5);
     this.sprite.label = this.type;
+    this.sprite.eventMode = "static";
 
-    // this.sprite.on("pointerover", (event) => {
-    //   console.log(event);
-    // });
-    // this.sprite.eventMode = "static";
-    let detail = new TowerDetail(
-      this.x,
-      this.y,
-      this.type,
-      this.damage,
-      this.speed,
-      this.radius,
-      this.effect,
-      this.bullet_color
-    );
-    // app.stage.addChild(detail);
-    // app.stage.removeChild(detail);
-    // detail.destroy();
+    this.sprite.on("pointerenter", (event) => {
+      this.detailTooltip = new TowerDetail(
+        this.x,
+        this.y,
+        this.type,
+        this.damage,
+        this.speed,
+        this.radius,
+        this.effect,
+        this.bullet_color,
+        this.sprite.width,
+        this.sprite.height
+      );
+      app.stage.addChild(this.detailTooltip.toolTipContainer);
+      //   this.detailRadius = new TowerRadius(
+      //     this.x,
+      //     this.y,
+      //     this.radius,
+      //     this.bullet_color
+      //   );
+      //   app.stage.addChild(this.detailRadius);
+    });
+
+    this.sprite.on("pointerleave", (event) => {
+      app.stage.removeChild(this.detailTooltip.toolTipContainer);
+      this.detailTooltip.toolTipContainer.destroy();
+      //   app.stage.removeChild(this.detailRadius);
+      //   this.detailRadius.destroy();
+    });
   }
 
   rotateTower(x, y) {
