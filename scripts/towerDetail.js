@@ -1,4 +1,4 @@
-class TowerDetail extends PIXI.Graphics {
+class TowerDetail extends PIXI.Container {
   constructor(
     x = 0,
     y = 0,
@@ -34,6 +34,7 @@ class TowerDetail extends PIXI.Graphics {
   }
 
   async initTowerDetail() {
+    this.eventMode = "static";
     const canvasWidth = app.renderer.width;
     const canvasHeight = app.renderer.height;
 
@@ -68,12 +69,14 @@ class TowerDetail extends PIXI.Graphics {
     };
 
     this.toolTipContainer = new PIXI.Container();
+
     const detailRadius = new PIXI.Graphics();
 
     detailRadius.circle(this.x, this.y, this.radius);
     detailRadius.fill(this.color);
     detailRadius.alpha = 0.3;
 
+    this.toolTipContainer.interactiveChildren = false;
     this.toolTipContainer.addChild(detailRadius);
 
     const detailBackground = new PIXI.Graphics();

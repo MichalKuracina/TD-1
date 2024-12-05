@@ -1,4 +1,4 @@
-class Tower extends PIXI.Graphics {
+class Tower extends PIXI.Container {
   constructor(x = 0, y = 0, type = "standard") {
     super();
     this.x = x;
@@ -13,7 +13,10 @@ class Tower extends PIXI.Graphics {
     this.bullet_speed = 1;
     this.shotTimeElapsed = 0;
     this.detailTooltip = null;
-    this.detailRadius = null;
+    this.detailButtonUpgrade = null;
+    this.detailButtonSell = null;
+    this.cost = 5;
+    this.cursorEntered = false;
 
     this.initTower();
   }
@@ -28,6 +31,7 @@ class Tower extends PIXI.Graphics {
         this.bullet_radius = 5;
         this.bullet_color = 0x996863;
         this.bullet_speed = 1;
+        this.cost = 10;
         break;
 
       case "slow":
@@ -38,6 +42,7 @@ class Tower extends PIXI.Graphics {
         this.bullet_radius = 7;
         this.bullet_color = 0x85b4f2;
         this.bullet_speed = 1;
+        this.cost = 15;
         break;
 
       default: // "standard"
@@ -48,6 +53,7 @@ class Tower extends PIXI.Graphics {
         this.bullet_radius = 3.5;
         this.bullet_color = 0x56a843;
         this.bullet_speed = 1;
+        this.cost = 5;
         break;
     }
 
@@ -61,8 +67,15 @@ class Tower extends PIXI.Graphics {
     this.sprite.anchor.set(0.5);
     this.sprite.label = this.type;
     this.sprite.eventMode = "static";
+    this.eventMode = "static";
 
     this.sprite.on("pointerenter", (event) => {
+      if (this.cursorEntered) {
+        return;
+      }
+
+      this.cursorEntered = true;
+
       this.detailTooltip = new TowerDetail(
         this.x,
         this.y,
@@ -75,21 +88,61 @@ class Tower extends PIXI.Graphics {
         this.sprite.width,
         this.sprite.height
       );
+
       app.stage.addChild(this.detailTooltip.toolTipContainer);
-      //   this.detailRadius = new TowerRadius(
-      //     this.x,
-      //     this.y,
-      //     this.radius,
-      //     this.bullet_color
+
+      //   this.detailButtonUpgrade = new TowerButton(
+      //     this.x - 18,
+      //     this.y - 16,
+      //     this.bullet_color,
+      //     "Upgrade"
       //   );
-      //   app.stage.addChild(this.detailRadius);
+      //   app.stage.addChild(this.detailButtonUpgrade.towerButtonContainer);
+      this.detailButtonSell = new TowerButton(
+        this.x - 18,
+        this.y + 3,
+        this.bullet_color,
+        "Sell"
+      );
+      app.stage.addChild(this.detailButtonSell.towerButtonContainer);
+
+      //   this.detailButtonUpgrade.towerButtonContainer.on("pointerdown", (e) => {
+      //     console.log("upgrade");
+      //     this.damage += 1;
+      //     this.cursorEntered = false;
+
+      //     app.stage.removeChild(this.detailTooltip.toolTipContainer);
+      //     this.detailTooltip.toolTipContainer.destroy();
+
+      //     app.stage.removeChild(this.detailButtonUpgrade.towerButtonContainer);
+      //     this.detailButtonUpgrade.towerButtonContainer.destroy();
+
+      //     app.stage.removeChild(this.detailButtonSell.towerButtonContainer);
+      //     this.detailButtonSell.towerButtonContainer.destroy();
+      //   });
     });
 
     this.sprite.on("pointerleave", (event) => {
+      const mousePosition = event.data.global;
+      if (
+        mousePosition.x > this.x - 32 &&
+        mousePosition.x < this.x + 32 &&
+        mousePosition.y < this.y + 32 &&
+        mousePosition.y > this.y - 32
+      ) {
+        return;
+      }
+
+      this.cursorEntered = false;
+
       app.stage.removeChild(this.detailTooltip.toolTipContainer);
       this.detailTooltip.toolTipContainer.destroy();
-      //   app.stage.removeChild(this.detailRadius);
-      //   this.detailRadius.destroy();
+
+      //   app.stage.removeChild(this.detailButtonUpgrade.towerButtonContainer);
+      //   this.detailButtonUpgrade.towerButtonContainer.destroy();
+
+      app.stage.removeChild(this.detailButtonSell.towerButtonContainer);
+      this.detailButtonSell.towerButtonContainer.destroy();
     });
   }
 

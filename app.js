@@ -55,6 +55,7 @@ function run() {
     app.stage.hitArea = app.screen;
 
     turret = new Tower(320, 192, "standard");
+    turret.eventMode = "static";
     // await turret.initTower();
     turrets.push(turret);
 
@@ -97,9 +98,31 @@ function run() {
     app.stage.addChild(enemy);
     enemies.push(enemy);
 
+    // console.log(turrets[0]);
+
+    // turrets[0].detailButtonSell?.towerButtonContainer?.on(
+    //   "pointerdown",
+    //   (e) => {
+    //     console.log("click");
+    //     // app.stage.removeChild(this);
+    //     // this.destroy();
+    //   }
+    // );
+
+    // console.log(turrets[0]);
+    // turrets[0].addEventListener("pointerdown", (e) => {
+    //   console.log("e");
+    // });
+
     // app.stage.addEventListener("pointermove", (e) => {
     //   turrets[0].rotateTower(e.global.x, e.global.y);
     // });
+
+    turrets[0].on("pointerdown", (e) => {
+      console.log("click");
+      // app.stage.removeChild(this);
+      // this.destroy();
+    });
 
     app.ticker.add(updateTick);
   })();
@@ -159,27 +182,31 @@ function updateTick(deltaTime) {
   //   }
 
   let bullet = null;
-  bullet = turrets[0].shoot2(enemies[0], deltaTime.deltaMS);
-  if (bullet) {
-    bullet.damage = turrets[0].damage;
-    app.stage.addChild(bullet);
-    bullets.push(bullet);
-  }
 
-  bullet = turrets[1].shoot2(enemies[1], deltaTime.deltaMS);
-  if (bullet) {
-    bullet.damage = turrets[1].damage;
-    app.stage.addChild(bullet);
-    bullets.push(bullet);
+  if (turrets[0]) {
+    bullet = turrets[0].shoot2(enemies[0], deltaTime.deltaMS);
+    if (bullet) {
+      bullet.damage = turrets[0].damage;
+      app.stage.addChild(bullet);
+      bullets.push(bullet);
+    }
   }
-
-  bullet = turrets[2].shoot2(enemies[2], deltaTime.deltaMS);
-  if (bullet) {
-    bullet.damage = turrets[2].damage;
-    app.stage.addChild(bullet);
-    bullets.push(bullet);
+  if (turrets[0]) {
+    bullet = turrets[1].shoot2(enemies[1], deltaTime.deltaMS);
+    if (bullet) {
+      bullet.damage = turrets[1].damage;
+      app.stage.addChild(bullet);
+      bullets.push(bullet);
+    }
   }
-
+  if (turrets[0]) {
+    bullet = turrets[2].shoot2(enemies[2], deltaTime.deltaMS);
+    if (bullet) {
+      bullet.damage = turrets[2].damage;
+      app.stage.addChild(bullet);
+      bullets.push(bullet);
+    }
+  }
   //   if (shootElapsed >= shootInterval) {
   //     shootElapsed = 0;
   //     if (enemies.length > 0) {
