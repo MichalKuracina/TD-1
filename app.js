@@ -54,18 +54,24 @@ function run() {
     app.stage.eventMode = "static";
     app.stage.hitArea = app.screen;
 
-    turret = new Tower(320, 192, "standard");
-    turret.eventMode = "static";
+    const texture = await PIXI.Assets.load(paneSprites.meta.image);
+    const spritesheet = new PIXI.Spritesheet(texture, paneSprites);
+    await spritesheet.parse();
+    const test = new PIXI.Sprite(spritesheet.textures["standard"]);
+
+    turret = new Tower2(test, 320, 192, "standard");
+
     // await turret.initTower();
+    app.stage.addChild(turret);
     turrets.push(turret);
 
-    turret = new Tower(384, 192, "splash");
-    // await turret.initTower();
-    turrets.push(turret);
+    // turret = new Tower2(384, 192, "splash");
+    // // await turret.initTower();
+    // turrets.push(turret);
 
-    turret = new Tower(448, 192, "slow");
-    // await turret.initTower();
-    turrets.push(turret);
+    // turret = new Tower2(448, 192, "slow");
+    // // await turret.initTower();
+    // turrets.push(turret);
 
     // app.stage.addChild(turret);
     // console.log(turrets);
@@ -77,26 +83,26 @@ function run() {
     // app.stage.addChild(bullet);
     // bullets.push(bullet);
 
-    let enemy = new Enemy(320, 64, 10, 0xfc0303, 1000, 1000, 0, [
-      { x: 128, y: 128 },
-      { x: 576, y: 64 },
+    let enemy = new Enemy(320, 64, 10, 0xfc0303, 1000, 1000, 0.01, [
+      { x: 320, y: 64 },
+      { x: 64, y: 64 },
     ]);
     app.stage.addChild(enemy);
     enemies.push(enemy);
 
-    enemy = new Enemy(384, 64, 10, 0xfc0303, 1000, 1000, 0, [
-      { x: 128, y: 128 },
-      { x: 576, y: 64 },
-    ]);
-    app.stage.addChild(enemy);
-    enemies.push(enemy);
+    // enemy = new Enemy(384, 64, 10, 0xfc0303, 1000, 1000, 0, [
+    //   { x: 128, y: 128 },
+    //   { x: 576, y: 64 },
+    // ]);
+    // app.stage.addChild(enemy);
+    // enemies.push(enemy);
 
-    enemy = new Enemy(448, 64, 10, 0xfc0303, 1000, 1000, 0, [
-      { x: 128, y: 128 },
-      { x: 576, y: 64 },
-    ]);
-    app.stage.addChild(enemy);
-    enemies.push(enemy);
+    // enemy = new Enemy(448, 64, 10, 0xfc0303, 1000, 1000, 0, [
+    //   { x: 128, y: 128 },
+    //   { x: 576, y: 64 },
+    // ]);
+    // app.stage.addChild(enemy);
+    // enemies.push(enemy);
 
     // console.log(turrets[0]);
 
@@ -118,10 +124,194 @@ function run() {
     //   turrets[0].rotateTower(e.global.x, e.global.y);
     // });
 
-    turrets[0].on("pointerdown", (e) => {
-      console.log("click");
-      // app.stage.removeChild(this);
-      // this.destroy();
+    // turrets[0].on("pointerdown", (e) => {
+    //   console.log("click");
+    //   // app.stage.removeChild(this);
+    //   // this.destroy();
+    // });
+
+    let towerToolTip;
+    let towerCircle;
+    let towerButtonUpgdare;
+    let towerButtonSell;
+
+    turrets[0].on("pointerdown", (event) => {
+      //   app.stage.removeChild(turrets[0]);
+      //   turrets[0].destroy();
+      //   turrets.splice(0, 1);
+
+      //   if (towerToolTip) {
+      //     app.stage.removeChild(towerToolTip);
+      //     towerToolTip.destroy();
+      //   }
+
+      //   if (towerCircle) {
+      //     app.stage.removeChild(towerCircle);
+      //     towerCircle.destroy();
+      //   }
+
+      const pointerPosition = event.data.global;
+      const hitObjects = app.stage.children.filter((item) => {
+        if (item) {
+          //   console.log(child.getBounds());
+          return (
+            // pointerPosition.x > item.x &&
+            // pointerPosition.x < item.x + item.width &&
+            // pointerPosition.y > item.y &&
+            // pointerPosition.y < item.y + item.height
+            // item.label === "upgrade" + turrets[0].uid
+            item.label?.includes(turrets[0].uid)
+          );
+          // .contains(pointerPosition.x, pointerPosition.y);
+        }
+        // console.log("");
+        return false;
+      });
+
+      console.log(hitObjects[0].label);
+
+      //   if (hitObjects.length > 0) {
+      //     // Get the topmost object (last in rendering order)
+      //     const topmostObject = hitObjects[hitObjects.length - 1];
+      //     console.log(`Topmost Object: ${topmostObject.name}`);
+      //   } else {
+      //     console.log("No object hit");
+      //   }
+    });
+
+    turrets[0].on("pointerenter", (event) => {
+      //   if (turrets[0].cursorEntered) {
+      //     return;
+      //   }
+
+      //   turrets[0].cursorEntered = true;
+
+      //   turrets[0].eventMode = "none";
+
+      towerCircle = new TowerCircle(
+        turrets[0].x,
+        turrets[0].y,
+        turrets[0].type,
+        turrets[0].damage,
+        turrets[0].speed,
+        turrets[0].radius,
+        turrets[0].effect,
+        turrets[0].bullet_color,
+        turrets[0].width,
+        turrets[0].height
+      );
+
+      app.stage.addChild(towerCircle);
+
+      towerToolTip = new TowerToolTip(
+        turrets[0].x,
+        turrets[0].y,
+        turrets[0].type,
+        turrets[0].damage,
+        turrets[0].speed,
+        turrets[0].radius,
+        turrets[0].effect,
+        turrets[0].bullet_color,
+        turrets[0].width,
+        turrets[0].height
+      );
+
+      app.stage.addChild(towerToolTip);
+
+      //   console.log(turrets[0].x);
+      towerButtonUpgdare = new TowerButton(
+        turrets[0].x - 16,
+        turrets[0].y - 14,
+        turrets[0].bullet_color,
+        "Upgrade",
+        "upgrade" + turrets[0].uid
+      );
+
+      app.stage.addChild(towerButtonUpgdare);
+
+      towerButtonSell = new TowerButton(
+        turrets[0].x - 16,
+        turrets[0].y + 5,
+        turrets[0].bullet_color,
+        "Sell",
+        "sell" + turrets[0].uid
+      );
+      //   towerButtonSell.eventMode = "static";
+      app.stage.addChild(towerButtonSell);
+
+      //   //   this.detailButtonUpgrade = new TowerButton(
+      //   //     this.x - 18,
+      //   //     this.y - 16,
+      //   //     this.bullet_color,
+      //   //     "Upgrade"
+      //   //   );
+      //   //   app.stage.addChild(this.detailButtonUpgrade.towerButtonContainer);
+      //   this.detailButtonSell = new TowerButton(
+      //     this.x - 18,
+      //     this.y + 3,
+      //     this.bullet_color,
+      //     "Sell"
+      //   );
+      //   app.stage.addChild(this.detailButtonSell.towerButtonContainer);
+
+      //   //   this.detailButtonUpgrade.towerButtonContainer.on("pointerdown", (e) => {
+      //   //     console.log("upgrade");
+      //   //     this.damage += 1;
+      //   //     this.cursorEntered = false;
+
+      //   //     app.stage.removeChild(this.detailTooltip.toolTipContainer);
+      //   //     this.detailTooltip.toolTipContainer.destroy();
+
+      //   //     app.stage.removeChild(this.detailButtonUpgrade.towerButtonContainer);
+      //   //     this.detailButtonUpgrade.towerButtonContainer.destroy();
+
+      //   //     app.stage.removeChild(this.detailButtonSell.towerButtonContainer);
+      //   //     this.detailButtonSell.towerButtonContainer.destroy();
+      //   //   });
+    });
+
+    turrets[0].on("pointerleave", (event) => {
+      //   const mousePosition = event.data.global;
+      //   if (
+      //     mousePosition.x > turrets[0].x - 32 &&
+      //     mousePosition.x < turrets[0].x + 32 &&
+      //     mousePosition.y < turrets[0].y + 32 &&
+      //     mousePosition.y > turrets[0].y - 32
+      //   ) {
+      //     return;
+      //   }
+
+      //   turrets[0].cursorEntered = false;
+
+      //   const mousePosition = event.data.global;
+      //   if (
+      //     mousePosition.x > this.x - 32 &&
+      //     mousePosition.x < this.x + 32 &&
+      //     mousePosition.y < this.y + 32 &&
+      //     mousePosition.y > this.y - 32
+      //   ) {
+      //     return;
+      //   }
+
+      //   this.cursorEntered = false;
+
+      app.stage.removeChild(towerToolTip);
+      towerToolTip.destroy();
+
+      app.stage.removeChild(towerCircle);
+      towerCircle.destroy();
+
+      app.stage.removeChild(towerButtonUpgdare);
+      towerButtonUpgdare.destroy();
+
+      app.stage.removeChild(towerButtonSell);
+      towerButtonSell.destroy();
+
+      //   app.stage.removeChild(this.detailButtonUpgrade.towerButtonContainer);
+      //   this.detailButtonUpgrade.towerButtonContainer.destroy();
+
+      //   app.stage.removeChild(this.detailButtonSell.towerButtonContainer);
+      //   this.detailButtonSell.towerButtonContainer.destroy();
     });
 
     app.ticker.add(updateTick);
@@ -172,14 +362,14 @@ function updateTick(deltaTime) {
     }
   }
 
-  //   // Rotate
-  //   if (enemies.length > 0) {
-  //     for (let i = 0; i < turrets.length; i++) {
-  //       const closesE = turrets[i].getClosesEnemy(enemies);
+  // Rotate
+  if (enemies.length > 0) {
+    for (let i = 0; i < turrets.length; i++) {
+      const closesE = turrets[i].getClosesEnemy(enemies);
 
-  //       turrets[i].rotateTower(closesE.x, closesE.y);
-  //     }
-  //   }
+      turrets[i].rotateTower(closesE.x, closesE.y);
+    }
+  }
 
   let bullet = null;
 
@@ -191,22 +381,23 @@ function updateTick(deltaTime) {
       bullets.push(bullet);
     }
   }
-  if (turrets[0]) {
-    bullet = turrets[1].shoot2(enemies[1], deltaTime.deltaMS);
-    if (bullet) {
-      bullet.damage = turrets[1].damage;
-      app.stage.addChild(bullet);
-      bullets.push(bullet);
-    }
-  }
-  if (turrets[0]) {
-    bullet = turrets[2].shoot2(enemies[2], deltaTime.deltaMS);
-    if (bullet) {
-      bullet.damage = turrets[2].damage;
-      app.stage.addChild(bullet);
-      bullets.push(bullet);
-    }
-  }
+
+  //   if (turrets[0]) {
+  //     bullet = turrets[1].shoot2(enemies[1], deltaTime.deltaMS);
+  //     if (bullet) {
+  //       bullet.damage = turrets[1].damage;
+  //       app.stage.addChild(bullet);
+  //       bullets.push(bullet);
+  //     }
+  //   }
+  //   if (turrets[0]) {
+  //     bullet = turrets[2].shoot2(enemies[2], deltaTime.deltaMS);
+  //     if (bullet) {
+  //       bullet.damage = turrets[2].damage;
+  //       app.stage.addChild(bullet);
+  //       bullets.push(bullet);
+  //     }
+  //   }
   //   if (shootElapsed >= shootInterval) {
   //     shootElapsed = 0;
   //     if (enemies.length > 0) {
