@@ -90,9 +90,9 @@ function run() {
     app.stage.addChild(enemy);
     enemies.push(enemy);
 
-    // enemy = new Enemy(384, 64, 10, 0xfc0303, 1000, 1000, 0, [
-    //   { x: 128, y: 128 },
-    //   { x: 576, y: 64 },
+    // enemy = new Enemy(320, 128, 10, 0xfc0303, 1000, 1000, 0.01, [
+    //   { x: 320, y: 64 },
+    //   { x: 64, y: 64 },
     // ]);
     // app.stage.addChild(enemy);
     // enemies.push(enemy);
@@ -241,6 +241,7 @@ function run() {
           app.stage.removeChild(turrets[0]);
           turrets[0].destroy();
           turrets.splice(0, 1);
+
           app.stage.removeChild(towerToolTip);
           towerToolTip.destroy();
 
@@ -449,6 +450,13 @@ function updateTick(deltaTime) {
         i--;
       }
     }
+  }
+
+  if (turrets[0].deleted) {
+    app.stage.removeChild(turrets[0]);
+    turrets[0].destroy();
+    turrets.splice(0, 1);
+    console.log("deleted");
   }
 
   // Rotate

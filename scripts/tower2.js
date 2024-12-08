@@ -17,6 +17,7 @@ class Tower2 extends PIXI.Sprite {
     this.detailButtonSell = null;
     this.cost = 5;
     this.cursorEntered = false;
+    this.deleted = true;
 
     this.initTower();
   }
@@ -144,7 +145,7 @@ class Tower2 extends PIXI.Sprite {
 
   upgrade() {
     this.damage += 1;
-    this.speed += 100;
+    this.speed -= 100;
     this.radius += 10;
     this.cost += 1;
   }
@@ -183,6 +184,15 @@ class Tower2 extends PIXI.Sprite {
       this.shotTimeElapsed = 0;
       const enemy_x = enemy.x;
       const enemy_y = enemy.y;
+
+      const dx = Math.abs(enemy_x - this.x);
+      const dy = Math.abs(enemy_y - this.y);
+      const distance = Math.sqrt(dx * dx + dy * dy);
+
+      if (distance > this.radius) {
+        return;
+      }
+
       return new Bullet(
         this.x,
         this.y,
