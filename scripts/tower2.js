@@ -142,6 +142,13 @@ class Tower2 extends PIXI.Sprite {
     // });
   }
 
+  upgrade() {
+    this.damage += 1;
+    this.speed += 100;
+    this.radius += 10;
+    this.cost += 1;
+  }
+
   rotateTower(x, y) {
     // console.log(x);
     const dx = x - this.x;

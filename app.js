@@ -150,25 +150,114 @@ function run() {
       //     towerCircle.destroy();
       //   }
 
-      const pointerPosition = event.data.global;
-      const hitObjects = app.stage.children.filter((item) => {
-        if (item) {
-          //   console.log(child.getBounds());
-          return (
-            // pointerPosition.x > item.x &&
-            // pointerPosition.x < item.x + item.width &&
-            // pointerPosition.y > item.y &&
-            // pointerPosition.y < item.y + item.height
-            // item.label === "upgrade" + turrets[0].uid
-            item.label?.includes(turrets[0].uid)
-          );
-          // .contains(pointerPosition.x, pointerPosition.y);
-        }
-        // console.log("");
-        return false;
-      });
+      const buttonOption = checkTowerButtonClicked(
+        event.data.global,
+        turrets[0].uid
+      );
 
-      console.log(hitObjects[0].label);
+      //   console.log(hitObjects);
+
+      //   if (hitObjects.length === 0) {
+      //     return;
+      //   }
+
+      switch (buttonOption) {
+        case "upgrade":
+          turrets[0].upgrade();
+          //   const tt = app.stage.children.filter((item) => {
+          //     return item.towerUid === "towerToolTip" + turrets[0].uid;
+          //   });
+          // //   console.log(tt);
+          //   tt[0].updateStats(
+          //     turrets[0].damage,
+          //     turrets[0].speed,
+          //     turrets[0].radius
+          //   );
+
+          app.stage.removeChild(towerCircle);
+          towerCircle.destroy();
+
+          towerCircle = new TowerCircle(
+            turrets[0].x,
+            turrets[0].y,
+            turrets[0].type,
+            turrets[0].damage,
+            turrets[0].speed,
+            turrets[0].radius,
+            turrets[0].effect,
+            turrets[0].bullet_color,
+            turrets[0].width,
+            turrets[0].height,
+            turrets[0].uid
+          );
+
+          app.stage.addChild(towerCircle);
+
+          app.stage.removeChild(towerToolTip);
+          towerToolTip.destroy();
+
+          towerToolTip = new TowerToolTip(
+            turrets[0].x,
+            turrets[0].y,
+            turrets[0].type,
+            turrets[0].damage,
+            turrets[0].speed,
+            turrets[0].radius,
+            turrets[0].effect,
+            turrets[0].bullet_color,
+            turrets[0].width,
+            turrets[0].height,
+            turrets[0].uid
+          );
+
+          app.stage.addChild(towerToolTip);
+
+          app.stage.removeChild(towerButtonUpgdare);
+          towerButtonUpgdare.destroy();
+
+          app.stage.removeChild(towerButtonSell);
+          towerButtonSell.destroy();
+
+          towerButtonUpgdare = new TowerButton(
+            turrets[0].x - 16,
+            turrets[0].y - 14,
+            turrets[0].bullet_color,
+            "Upgrade",
+            "upgrade" + turrets[0].uid
+          );
+          app.stage.addChild(towerButtonUpgdare);
+
+          towerButtonSell = new TowerButton(
+            turrets[0].x - 16,
+            turrets[0].y + 5,
+            turrets[0].bullet_color,
+            "Sell",
+            "sell" + turrets[0].uid
+          );
+          app.stage.addChild(towerButtonSell);
+
+          break;
+        case "sell":
+          app.stage.removeChild(turrets[0]);
+          turrets[0].destroy();
+          turrets.splice(0, 1);
+          app.stage.removeChild(towerToolTip);
+          towerToolTip.destroy();
+
+          app.stage.removeChild(towerCircle);
+          towerCircle.destroy();
+
+          app.stage.removeChild(towerButtonUpgdare);
+          towerButtonUpgdare.destroy();
+
+          app.stage.removeChild(towerButtonSell);
+          towerButtonSell.destroy();
+          break;
+
+        default:
+          // do nothing
+          break;
+      }
 
       //   if (hitObjects.length > 0) {
       //     // Get the topmost object (last in rendering order)
@@ -198,7 +287,8 @@ function run() {
         turrets[0].effect,
         turrets[0].bullet_color,
         turrets[0].width,
-        turrets[0].height
+        turrets[0].height,
+        turrets[0].uid
       );
 
       app.stage.addChild(towerCircle);
@@ -213,7 +303,8 @@ function run() {
         turrets[0].effect,
         turrets[0].bullet_color,
         turrets[0].width,
-        turrets[0].height
+        turrets[0].height,
+        turrets[0].uid
       );
 
       app.stage.addChild(towerToolTip);
@@ -226,7 +317,6 @@ function run() {
         "Upgrade",
         "upgrade" + turrets[0].uid
       );
-
       app.stage.addChild(towerButtonUpgdare);
 
       towerButtonSell = new TowerButton(
@@ -236,7 +326,6 @@ function run() {
         "Sell",
         "sell" + turrets[0].uid
       );
-      //   towerButtonSell.eventMode = "static";
       app.stage.addChild(towerButtonSell);
 
       //   //   this.detailButtonUpgrade = new TowerButton(
@@ -490,4 +579,33 @@ function checkHitWall(bullet) {
   }
 
   return false;
+}
+
+function checkTowerButtonClicked(pointerPosition, towerUid) {
+  // const pointerPosition = event.data.global;
+  //   console.log("pointerPositionX " + pointerPosition.x);
+  //   console.log("pointerPositionY " + pointerPosition.y);
+
+  const hitObjects = app.stage.children.filter((item) => {
+    if (item) {
+      return (
+        pointerPosition.x > item.tower_x &&
+        pointerPosition.x < item.tower_x + item.width &&
+        pointerPosition.y > item.tower_y &&
+        pointerPosition.y < item.tower_y + item.height &&
+        (item.label === "upgrade" + towerUid ||
+          item.label === "sell" + towerUid)
+        // item.label?.includes(turrets[0].uid)
+      );
+    }
+
+    // return false;
+    // console.log(item?.label);
+  });
+
+  if (hitObjects.length === 0 || hitObjects.length > 1) {
+    return "";
+  } else {
+    return hitObjects[0].text.toLowerCase();
+  }
 }

@@ -9,7 +9,8 @@ class TowerCircle extends PIXI.Graphics {
     effect = "none",
     color = 0x56a843,
     towerWidth = 0,
-    towerHeight = 0
+    towerHeight = 0,
+    towerUid = ""
   ) {
     super();
     this.tower_x = x;
@@ -22,6 +23,7 @@ class TowerCircle extends PIXI.Graphics {
     this.color = color;
     this.towerWidth = towerWidth;
     this.towerHeight = towerHeight;
+    this.towerUid = "towerCircle" + towerUid;
     this.toolTipContainer = null;
     this.toolTipWidth = 95;
     this.toolTipHeight = 75;
