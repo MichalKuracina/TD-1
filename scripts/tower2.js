@@ -17,7 +17,7 @@ class Tower2 extends PIXI.Sprite {
     this.detailButtonSell = null;
     this.cost = 5;
     this.cursorEntered = false;
-    this.deleted = true;
+    this.deleted = false;
 
     this.initTower();
   }
@@ -58,89 +58,11 @@ class Tower2 extends PIXI.Sprite {
         break;
     }
 
-    // app.stage.addChild(this);
-
     this.position.set(this.x, this.y);
     this.anchor.set(0.5);
     this.label = this.type;
     this.name = this.type;
     this.eventMode = "static";
-
-    // this.on("pointerenter", (event) => {
-    //   if (this.cursorEntered) {
-    //     return;
-    //   }
-
-    //   this.cursorEntered = true;
-
-    //   this.detailTooltip = new TowerDetail(
-    //     this.x,
-    //     this.y,
-    //     this.type,
-    //     this.damage,
-    //     this.speed,
-    //     this.radius,
-    //     this.effect,
-    //     this.bullet_color,
-    //     this.width,
-    //     this.height
-    //   );
-
-    //   app.stage.addChild(this.detailTooltip.toolTipContainer);
-
-    //   //   this.detailButtonUpgrade = new TowerButton(
-    //   //     this.x - 18,
-    //   //     this.y - 16,
-    //   //     this.bullet_color,
-    //   //     "Upgrade"
-    //   //   );
-    //   //   app.stage.addChild(this.detailButtonUpgrade.towerButtonContainer);
-    //   this.detailButtonSell = new TowerButton(
-    //     this.x - 18,
-    //     this.y + 3,
-    //     this.bullet_color,
-    //     "Sell"
-    //   );
-    //   app.stage.addChild(this.detailButtonSell.towerButtonContainer);
-
-    //   //   this.detailButtonUpgrade.towerButtonContainer.on("pointerdown", (e) => {
-    //   //     console.log("upgrade");
-    //   //     this.damage += 1;
-    //   //     this.cursorEntered = false;
-
-    //   //     app.stage.removeChild(this.detailTooltip.toolTipContainer);
-    //   //     this.detailTooltip.toolTipContainer.destroy();
-
-    //   //     app.stage.removeChild(this.detailButtonUpgrade.towerButtonContainer);
-    //   //     this.detailButtonUpgrade.towerButtonContainer.destroy();
-
-    //   //     app.stage.removeChild(this.detailButtonSell.towerButtonContainer);
-    //   //     this.detailButtonSell.towerButtonContainer.destroy();
-    //   //   });
-    // });
-
-    // this.on("pointerleave", (event) => {
-    //   const mousePosition = event.data.global;
-    //   if (
-    //     mousePosition.x > this.x - 32 &&
-    //     mousePosition.x < this.x + 32 &&
-    //     mousePosition.y < this.y + 32 &&
-    //     mousePosition.y > this.y - 32
-    //   ) {
-    //     return;
-    //   }
-
-    //   this.cursorEntered = false;
-
-    //   app.stage.removeChild(this.detailTooltip.toolTipContainer);
-    //   this.detailTooltip.toolTipContainer.destroy();
-
-    //   //   app.stage.removeChild(this.detailButtonUpgrade.towerButtonContainer);
-    //   //   this.detailButtonUpgrade.towerButtonContainer.destroy();
-
-    //   app.stage.removeChild(this.detailButtonSell.towerButtonContainer);
-    //   this.detailButtonSell.towerButtonContainer.destroy();
-    // });
   }
 
   upgrade() {
@@ -151,33 +73,14 @@ class Tower2 extends PIXI.Sprite {
   }
 
   rotateTower(x, y) {
-    // console.log(x);
     const dx = x - this.x;
     const dy = y - this.y;
     const angle = Math.atan2(dy, dx);
     const rotationOffset = Math.PI / 2;
-    // console.log(angle + rotationOffset);
     this.rotation = angle + rotationOffset;
   }
 
-  shoot(enemy) {
-    const enemy_x = enemy.x;
-    const enemy_y = enemy.y;
-    return new Bullet(
-      this.x,
-      this.y,
-      this.x,
-      this.y,
-      enemy_x,
-      enemy_y,
-      this.bullet_speed,
-      this.bullet_radius,
-      this.bullet_color,
-      this.damage
-    );
-  }
-
-  shoot2(enemy, deltaMS) {
+  shoot(enemy, deltaMS) {
     this.shotTimeElapsed += deltaMS;
 
     if (this.shotTimeElapsed >= this.speed) {
@@ -190,6 +93,7 @@ class Tower2 extends PIXI.Sprite {
       const distance = Math.sqrt(dx * dx + dy * dy);
 
       if (distance > this.radius) {
+        // Don't shoot. Target is out of range.
         return;
       }
 
@@ -208,7 +112,7 @@ class Tower2 extends PIXI.Sprite {
     }
   }
 
-  getClosesEnemy(enemies) {
+  getClosestEnemy(enemies) {
     let currentEnemyDistance;
     let closesEnemyDistance;
     let closesEnemyObject;
