@@ -4,8 +4,11 @@ class Tower2 extends PIXI.Sprite {
     this.x = x;
     this.y = y;
     this.type = type;
+    this.level = 1;
     this.damage = 1;
     this.speed = 1000;
+    this.maxSpeed = 100;
+    this.speedStep = 100;
     this.radius = 100;
     this.effect = "none";
     this.bullet_radius = 5;
@@ -16,8 +19,10 @@ class Tower2 extends PIXI.Sprite {
     this.detailButtonUpgrade = null;
     this.detailButtonSell = null;
     this.cost = 5;
-    this.cursorEntered = false;
-    this.deleted = false;
+    this.towerToolTip = null;
+    this.towerCircle = null;
+    this.towerButtonUpgdare = null;
+    this.towerButtonSell = null;
 
     this.initTower();
   }
@@ -27,28 +32,31 @@ class Tower2 extends PIXI.Sprite {
       case "splash":
         this.damage = 3;
         this.speed = 2000;
+        this.speedStep = 150;
         this.radius = 200;
         this.effect = "splash";
         this.bullet_radius = 5;
         this.bullet_color = 0x996863;
-        this.bullet_speed = 1;
+        this.bullet_speed = 1.3;
         this.cost = 10;
         break;
 
       case "slow":
         this.damage = 2;
         this.speed = 3000;
+        this.speedStep = 200;
         this.radius = 100;
         this.effect = "slow";
         this.bullet_radius = 7;
         this.bullet_color = 0x85b4f2;
-        this.bullet_speed = 1;
+        this.bullet_speed = 1.2;
         this.cost = 15;
         break;
 
       default: // "standard"
         this.damage = 1;
         this.speed = 1000;
+        this.speedStep = 100;
         this.radius = 300;
         this.effect = "none";
         this.bullet_radius = 3.5;
@@ -63,13 +71,125 @@ class Tower2 extends PIXI.Sprite {
     this.label = this.type;
     this.name = this.type;
     this.eventMode = "static";
+
+    this.on("pointerdown", (event) => {
+      const buttonOption = checkTowerButtonClicked(event.data.global, this.uid);
+
+      switch (buttonOption) {
+        case "upgrade":
+          this.upgrade();
+          this.destroyTowerSprites();
+          this.addTowerSprites();
+          break;
+        case "sell":
+          app.stage.removeChild(this);
+          this.destroy();
+
+          const towerIndex = turrets.findIndex(
+            (obj) => obj["uid"] === this.uid
+          );
+          turrets.splice(towerIndex, 1);
+          this.destroyTowerSprites();
+          break;
+
+        default:
+          // Do nothing.
+          break;
+      }
+    });
+
+    this.on("pointerenter", (event) => {
+      this.addTowerSprites();
+    });
+
+    this.on("pointerleave", (event) => {
+      this.destroyTowerSprites();
+    });
+  }
+
+  addTowerSprites() {
+    // Add circle.
+    this.towerCircle = new TowerCircle(
+      this.x,
+      this.y,
+      this.type,
+      this.damage,
+      this.speed,
+      this.radius,
+      this.effect,
+      this.bullet_color,
+      this.width,
+      this.height,
+      this.uid
+    );
+    app.stage.addChild(this.towerCircle);
+
+    // Add tooltip.
+    this.towerToolTip = new TowerToolTip(
+      this.x,
+      this.y,
+      this.type,
+      this.damage,
+      this.speed,
+      this.radius,
+      this.effect,
+      this.bullet_color,
+      this.width,
+      this.height,
+      this.uid,
+      this.level,
+      this.cost
+    );
+    app.stage.addChild(this.towerToolTip);
+
+    // Add upgrade button.
+    this.towerButtonUpgdare = new TowerButton(
+      this.x - 16,
+      this.y - 14,
+      this.bullet_color,
+      "Upgrade",
+      "upgrade" + this.uid
+    );
+    app.stage.addChild(this.towerButtonUpgdare);
+
+    // Add sell button.
+    this.towerButtonSell = new TowerButton(
+      this.x - 16,
+      this.y + 5,
+      this.bullet_color,
+      "Sell",
+      "sell" + this.uid
+    );
+    app.stage.addChild(this.towerButtonSell);
+  }
+
+  destroyTowerSprites() {
+    // Destroy tooltip.
+    app.stage.removeChild(this.towerToolTip);
+    this.towerToolTip.destroy();
+    // Destroy circle.
+    app.stage.removeChild(this.towerCircle);
+    this.towerCircle.destroy();
+    // Destroy upgrade button.
+    app.stage.removeChild(this.towerButtonUpgdare);
+    this.towerButtonUpgdare.destroy();
+    // Destroy sell button.
+    app.stage.removeChild(this.towerButtonSell);
+    this.towerButtonSell.destroy();
   }
 
   upgrade() {
     this.damage += 1;
-    this.speed -= 100;
     this.radius += 10;
     this.cost += 1;
+    console.log(this.speed);
+    console.log(this.speedStep);
+    console.log(this.speed - this.level * this.speedStep);
+    if (this.speed - this.level * this.speedStep > this.maxSpeed) {
+      console.log("increase");
+      this.speed += this.speedStep;
+      this.level += 1;
+    }
   }
 
   rotateTower(x, y) {
@@ -83,7 +203,8 @@ class Tower2 extends PIXI.Sprite {
   shoot(enemy, deltaMS) {
     this.shotTimeElapsed += deltaMS;
 
-    if (this.shotTimeElapsed >= this.speed) {
+    if (this.shotTimeElapsed >= this.speed - this.level * this.speedStep) {
+      //   console.log(this.shotTimeElapsed);
       this.shotTimeElapsed = 0;
       const enemy_x = enemy.x;
       const enemy_y = enemy.y;

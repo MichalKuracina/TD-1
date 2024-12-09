@@ -10,7 +10,9 @@ class TowerToolTip extends PIXI.Graphics {
     color = 0x56a843,
     towerWidth = 0,
     towerHeight = 0,
-    towerUid
+    towerUid = null,
+    level = 1,
+    cost = 5
   ) {
     super();
     this.tower_x = x;
@@ -24,9 +26,9 @@ class TowerToolTip extends PIXI.Graphics {
     this.towerWidth = towerWidth;
     this.towerHeight = towerHeight;
     this.towerUid = "towerToolTip" + towerUid;
-    this.toolTipContainer = null;
+    (this.level = level), (this.cost = cost), (this.toolTipContainer = null);
     this.toolTipWidth = 95;
-    this.toolTipHeight = 75;
+    this.toolTipHeight = 100;
     this.toolTip_x = 0;
     this.toolTip_y = 0;
     this.toolTipCorners = 5;
@@ -82,19 +84,6 @@ class TowerToolTip extends PIXI.Graphics {
       fill: 0x000000,
     };
 
-    // this.toolTipContainer = new PIXI.Container();
-
-    // const detailRadius = new PIXI.Graphics();
-
-    // this.circle(this.tower_x, this.tower_y, this.radius);
-    // this.fill(this.color);
-    // this.alpha = 0.3;
-
-    // this.toolTipContainer.interactiveChildren = false;
-    // this.toolTipContainer.addChild(detailRadius);
-
-    // const detailBackground = new PIXI.Graphics();
-
     this.roundRect(
       this.toolTip_x,
       this.toolTip_y,
@@ -112,8 +101,6 @@ class TowerToolTip extends PIXI.Graphics {
       this.toolTipCorners - 1
     );
     this.fill(this.color);
-    // this.alpha = 0.6;
-    // this.addChild(detailBackground);
 
     const labelType = new PIXI.BitmapText({
       text: `Type: ${
@@ -126,13 +113,31 @@ class TowerToolTip extends PIXI.Graphics {
     labelType.y = this.toolTip_y + 4;
     this.addChild(labelType);
 
+    const labelLevel = new PIXI.BitmapText({
+      text: `Level: ${this.level}`,
+      style: fontStyle,
+    });
+
+    labelLevel.x = this.toolTip_x + 5;
+    labelLevel.y = this.toolTip_y + 17;
+    this.addChild(labelLevel);
+
+    const lebelCost = new PIXI.BitmapText({
+      text: `Cost: ${this.cost}`,
+      style: fontStyle,
+    });
+
+    lebelCost.x = this.toolTip_x + 5;
+    lebelCost.y = this.toolTip_y + 30;
+    this.addChild(lebelCost);
+
     const labelDamage = new PIXI.BitmapText({
       text: `Damage: ${this.damage}`,
       style: fontStyle,
     });
 
     labelDamage.x = this.toolTip_x + 5;
-    labelDamage.y = this.toolTip_y + 17;
+    labelDamage.y = this.toolTip_y + 43;
     this.addChild(labelDamage);
 
     const labelSpeed = new PIXI.BitmapText({
@@ -141,7 +146,7 @@ class TowerToolTip extends PIXI.Graphics {
     });
 
     labelSpeed.x = this.toolTip_x + 5;
-    labelSpeed.y = this.toolTip_y + 30;
+    labelSpeed.y = this.toolTip_y + 56;
     this.addChild(labelSpeed);
 
     const labelRadius = new PIXI.BitmapText({
@@ -150,7 +155,7 @@ class TowerToolTip extends PIXI.Graphics {
     });
 
     labelRadius.x = this.toolTip_x + 5;
-    labelRadius.y = this.toolTip_y + 43;
+    labelRadius.y = this.toolTip_y + 69;
     this.addChild(labelRadius);
 
     const labelEffect = new PIXI.BitmapText({
@@ -159,7 +164,7 @@ class TowerToolTip extends PIXI.Graphics {
     });
 
     labelEffect.x = this.toolTip_x + 5;
-    labelEffect.y = this.toolTip_y + 56;
+    labelEffect.y = this.toolTip_y + 82;
     this.addChild(labelEffect);
   }
 }
