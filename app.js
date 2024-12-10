@@ -56,24 +56,38 @@ function run() {
     const spritesheet = new PIXI.Spritesheet(texture, paneSprites);
     await spritesheet.parse();
 
-    const towerStandardTexture = new PIXI.Sprite(
-      spritesheet.textures["standard"]
-    );
-    let turret = new Tower2(towerStandardTexture, 320, 192, "standard");
-    app.stage.addChild(turret);
-    turrets.push(turret);
+    // const towerStandardTexture = new PIXI.Sprite(
+    //   spritesheet.textures["standard"]
+    // );
+    // let turret = new Tower2(towerStandardTexture, 320, 192, "standard");
+    // app.stage.addChild(turret);
+    // turrets.push(turret);
 
     const towerSplashTexture = new PIXI.Sprite(spritesheet.textures["splash"]);
     turret = new Tower2(towerSplashTexture, 384, 192, "splash");
     app.stage.addChild(turret);
     turrets.push(turret);
 
-    const towerSlowTexture = new PIXI.Sprite(spritesheet.textures["slow"]);
-    turret = new Tower2(towerSlowTexture, 448, 192, "slow");
-    app.stage.addChild(turret);
-    turrets.push(turret);
+    // const towerSlowTexture = new PIXI.Sprite(spritesheet.textures["slow"]);
+    // turret = new Tower2(towerSlowTexture, 448, 192, "slow");
+    // app.stage.addChild(turret);
+    // turrets.push(turret);
 
-    let enemy = new Enemy(384, 128, 10, 0xfc0303, 1000, 1000, 0.01, [
+    let enemy = new Enemy(355, 128, 10, 0xfc0303, 20, 20, 0.01, [
+      { x: 320, y: 64 },
+      { x: 64, y: 64 },
+    ]);
+    app.stage.addChild(enemy);
+    enemies.push(enemy);
+
+    enemy = new Enemy(384, 128, 10, 0xfc0303, 20, 20, 0.01, [
+      { x: 320, y: 64 },
+      { x: 64, y: 64 },
+    ]);
+    app.stage.addChild(enemy);
+    enemies.push(enemy);
+
+    enemy = new Enemy(410, 128, 10, 0xfc0303, 20, 20, 0.01, [
       { x: 320, y: 64 },
       { x: 64, y: 64 },
     ]);
@@ -122,13 +136,6 @@ function updateTick(deltaTime) {
       }
     }
   }
-
-  //   if (turrets[0].deleted) {
-  //     app.stage.removeChild(turrets[0]);
-  //     turrets[0].destroy();
-  //     turrets.splice(0, 1);
-  //     console.log("deleted");
-  //   }
 
   // Rotate and Shoot.
   if (enemies.length > 0) {
@@ -185,7 +192,27 @@ function checkHitEnemy(bullet, enemies) {
     if (distance <= bullet.radius + enemies[i].radius) {
       app.stage.removeChild(bullet);
       bullet.destroy();
+
+      // Hit primary target.
       enemies[i].hit(bullet.damage);
+
+      const secondaryTargets = enemies.filter(
+        (enm) => enm.uid !== enemies[i].uid
+      );
+
+      // Hit secondary targets (splash).
+      for (let j = 0; j < secondaryTargets.length; j++) {
+        const sx = Math.abs(bullet.position_x - secondaryTargets[j].x);
+        const sy = Math.abs(bullet.position_y - secondaryTargets[j].y);
+        const splashDistance = Math.sqrt(sx * sx + sy * sy);
+
+        if (
+          splashDistance <=
+          bullet.splashRadius + secondaryTargets[j].radius
+        ) {
+          secondaryTargets[j].hit(bullet.splashDamage);
+        }
+      }
 
       if (enemies[i].health <= 0) {
         app.stage.removeChild(enemies[i]);
@@ -215,33 +242,4 @@ function checkHitWall(bullet) {
   }
 
   return false;
-}
-
-function checkTowerButtonClicked(pointerPosition, towerUid) {
-  // const pointerPosition = event.data.global;
-  //   console.log("pointerPositionX " + pointerPosition.x);
-  //   console.log("pointerPositionY " + pointerPosition.y);
-
-  const hitObjects = app.stage.children.filter((item) => {
-    if (item) {
-      return (
-        pointerPosition.x > item.tower_x &&
-        pointerPosition.x < item.tower_x + item.width &&
-        pointerPosition.y > item.tower_y &&
-        pointerPosition.y < item.tower_y + item.height &&
-        (item.label === "upgrade" + towerUid ||
-          item.label === "sell" + towerUid)
-        // item.label?.includes(turrets[0].uid)
-      );
-    }
-
-    // return false;
-    // console.log(item?.label);
-  });
-
-  if (hitObjects.length === 0 || hitObjects.length > 1) {
-    return "";
-  } else {
-    return hitObjects[0].text.toLowerCase();
-  }
 }

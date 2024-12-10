@@ -26,7 +26,8 @@ class TowerToolTip extends PIXI.Graphics {
     this.towerWidth = towerWidth;
     this.towerHeight = towerHeight;
     this.towerUid = "towerToolTip" + towerUid;
-    (this.level = level), (this.cost = cost), (this.toolTipContainer = null);
+    this.level = level;
+    this.cost = cost;
     this.toolTipWidth = 95;
     this.toolTipHeight = 100;
     this.toolTip_x = 0;

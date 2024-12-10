@@ -7,6 +7,7 @@ class Tower2 extends PIXI.Sprite {
     this.level = 1;
     this.damage = 1;
     this.speed = 1000;
+    this.rateOfFire = this.speed;
     this.maxSpeed = 100;
     this.speedStep = 100;
     this.radius = 100;
@@ -14,6 +15,7 @@ class Tower2 extends PIXI.Sprite {
     this.bullet_radius = 5;
     this.bullet_color = 0xf4fc03;
     this.bullet_speed = 1;
+    this.bullet_splashRadius = 0;
     this.shotTimeElapsed = 0;
     this.detailTooltip = null;
     this.detailButtonUpgrade = null;
@@ -39,6 +41,8 @@ class Tower2 extends PIXI.Sprite {
         this.bullet_color = 0x996863;
         this.bullet_speed = 1.3;
         this.cost = 10;
+        this.maxSpeed = 200;
+        this.bullet_splashRadius = 25;
         break;
 
       case "slow":
@@ -51,6 +55,8 @@ class Tower2 extends PIXI.Sprite {
         this.bullet_color = 0x85b4f2;
         this.bullet_speed = 1.2;
         this.cost = 15;
+        this.maxSpeed = 300;
+        this.bullet_splashRadius = 0;
         break;
 
       default: // "standard"
@@ -63,6 +69,8 @@ class Tower2 extends PIXI.Sprite {
         this.bullet_color = 0x56a843;
         this.bullet_speed = 1;
         this.cost = 5;
+        this.maxSpeed = 100;
+        this.bullet_splashRadius = 0;
         break;
     }
 
@@ -73,7 +81,10 @@ class Tower2 extends PIXI.Sprite {
     this.eventMode = "static";
 
     this.on("pointerdown", (event) => {
-      const buttonOption = checkTowerButtonClicked(event.data.global, this.uid);
+      const buttonOption = this.checkTowerButtonClicked(
+        event.data.global,
+        this.uid
+      );
 
       switch (buttonOption) {
         case "upgrade":
@@ -112,15 +123,8 @@ class Tower2 extends PIXI.Sprite {
     this.towerCircle = new TowerCircle(
       this.x,
       this.y,
-      this.type,
-      this.damage,
-      this.speed,
       this.radius,
-      this.effect,
-      this.bullet_color,
-      this.width,
-      this.height,
-      this.uid
+      this.bullet_color
     );
     app.stage.addChild(this.towerCircle);
 
@@ -182,13 +186,32 @@ class Tower2 extends PIXI.Sprite {
     this.damage += 1;
     this.radius += 10;
     this.cost += 1;
-    console.log(this.speed);
-    console.log(this.speedStep);
-    console.log(this.speed - this.level * this.speedStep);
-    if (this.speed - this.level * this.speedStep > this.maxSpeed) {
-      console.log("increase");
+
+    if (this.rateOfFire - this.speedStep > this.maxSpeed) {
       this.speed += this.speedStep;
       this.level += 1;
+      this.rateOfFire -= this.speedStep;
+    }
+  }
+
+  checkTowerButtonClicked(pointerPosition, towerUid) {
+    const hitObjects = app.stage.children.filter((item) => {
+      if (item) {
+        return (
+          pointerPosition.x > item.tower_x &&
+          pointerPosition.x < item.tower_x + item.width &&
+          pointerPosition.y > item.tower_y &&
+          pointerPosition.y < item.tower_y + item.height &&
+          (item.label === "upgrade" + towerUid ||
+            item.label === "sell" + towerUid)
+        );
+      }
+    });
+
+    if (hitObjects.length === 0 || hitObjects.length > 1) {
+      return "";
+    } else {
+      return hitObjects[0].text.toLowerCase();
     }
   }
 
@@ -203,7 +226,7 @@ class Tower2 extends PIXI.Sprite {
   shoot(enemy, deltaMS) {
     this.shotTimeElapsed += deltaMS;
 
-    if (this.shotTimeElapsed >= this.speed - this.level * this.speedStep) {
+    if (this.shotTimeElapsed >= this.rateOfFire) {
       //   console.log(this.shotTimeElapsed);
       this.shotTimeElapsed = 0;
       const enemy_x = enemy.x;
@@ -228,7 +251,8 @@ class Tower2 extends PIXI.Sprite {
         this.bullet_speed,
         this.bullet_radius,
         this.bullet_color,
-        this.damage
+        this.damage,
+        this.bullet_splashRadius
       );
     }
   }

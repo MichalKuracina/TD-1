@@ -9,7 +9,8 @@ class Bullet extends PIXI.Graphics {
     speed = 1,
     radius = 5,
     color = 0xf4fc03,
-    damage = 1
+    damage = 1,
+    splashRadius = 0
   ) {
     super();
     this.position_x = position_x;
@@ -22,6 +23,8 @@ class Bullet extends PIXI.Graphics {
     this.radius = radius;
     this.color = color;
     this.damage = damage;
+    this.splashDamage = this.damage / 2;
+    this.splashRadius = splashRadius;
 
     this.distance = 0;
 
