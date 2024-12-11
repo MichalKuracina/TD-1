@@ -17,7 +17,7 @@ let turrets = [];
 let enemies = [];
 
 let app;
-let paneObj;
+let menu;
 let bullet;
 
 const spawnInterval = 1000;
@@ -52,47 +52,50 @@ function run() {
     app.stage.eventMode = "static";
     app.stage.hitArea = app.screen;
 
-    const texture = await PIXI.Assets.load(paneSprites.meta.image);
-    const spritesheet = new PIXI.Spritesheet(texture, paneSprites);
-    await spritesheet.parse();
+    menu = new Menu();
+    app.stage.addChild(menu);
+
+    // const texture = await PIXI.Assets.load(paneSprites.meta.image);
+    // const spritesheet = new PIXI.Spritesheet(texture, paneSprites);
+    // await spritesheet.parse();
 
     // const towerStandardTexture = new PIXI.Sprite(
     //   spritesheet.textures["standard"]
     // );
-    // let turret = new Tower2(towerStandardTexture, 320, 192, "standard");
+    // let turret = new Tower2(towerStandardTexture, 384, 192, "standard");
     // app.stage.addChild(turret);
     // turrets.push(turret);
 
-    const towerSplashTexture = new PIXI.Sprite(spritesheet.textures["splash"]);
-    turret = new Tower2(towerSplashTexture, 384, 192, "splash");
-    app.stage.addChild(turret);
-    turrets.push(turret);
+    // const towerSplashTexture = new PIXI.Sprite(spritesheet.textures["splash"]);
+    // turret = new Tower2(towerSplashTexture, 384, 192, "splash");
+    // app.stage.addChild(turret);
+    // turrets.push(turret);
 
     // const towerSlowTexture = new PIXI.Sprite(spritesheet.textures["slow"]);
     // turret = new Tower2(towerSlowTexture, 448, 192, "slow");
     // app.stage.addChild(turret);
     // turrets.push(turret);
 
-    let enemy = new Enemy(355, 128, 10, 0xfc0303, 20, 20, 0.01, [
-      { x: 320, y: 64 },
-      { x: 64, y: 64 },
-    ]);
-    app.stage.addChild(enemy);
-    enemies.push(enemy);
+    // let enemy = new Enemy(355, 128, 10, 0xfc0303, 20, 20, 0.5, [
+    //   { x: -64, y: 128 },
+    //   { x: canvasWidth + 64, y: 128 },
+    // ]);
+    // app.stage.addChild(enemy);
+    // enemies.push(enemy);
 
-    enemy = new Enemy(384, 128, 10, 0xfc0303, 20, 20, 0.01, [
-      { x: 320, y: 64 },
-      { x: 64, y: 64 },
-    ]);
-    app.stage.addChild(enemy);
-    enemies.push(enemy);
+    // enemy = new Enemy(384, 128, 10, 0xfc0303, 20, 20, 0.01, [
+    //   { x: 320, y: 64 },
+    //   { x: 64, y: 64 },
+    // ]);
+    // app.stage.addChild(enemy);
+    // enemies.push(enemy);
 
-    enemy = new Enemy(410, 128, 10, 0xfc0303, 20, 20, 0.01, [
-      { x: 320, y: 64 },
-      { x: 64, y: 64 },
-    ]);
-    app.stage.addChild(enemy);
-    enemies.push(enemy);
+    // enemy = new Enemy(410, 128, 10, 0xfc0303, 20, 20, 0.01, [
+    //   { x: 320, y: 64 },
+    //   { x: 64, y: 64 },
+    // ]);
+    // app.stage.addChild(enemy);
+    // enemies.push(enemy);
 
     app.ticker.add(updateTick);
   })();
@@ -194,7 +197,8 @@ function checkHitEnemy(bullet, enemies) {
       bullet.destroy();
 
       // Hit primary target.
-      enemies[i].hit(bullet.damage);
+
+      enemies[i].hit(bullet.damage, bullet.slowCoefficient);
 
       const secondaryTargets = enemies.filter(
         (enm) => enm.uid !== enemies[i].uid
@@ -210,7 +214,7 @@ function checkHitEnemy(bullet, enemies) {
           splashDistance <=
           bullet.splashRadius + secondaryTargets[j].radius
         ) {
-          secondaryTargets[j].hit(bullet.splashDamage);
+          secondaryTargets[j].hit(bullet.splashDamage, bullet.slowCoefficient);
         }
       }
 

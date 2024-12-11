@@ -9,13 +9,14 @@ class Tower2 extends PIXI.Sprite {
     this.speed = 1000;
     this.rateOfFire = this.speed;
     this.maxSpeed = 100;
-    this.speedStep = 100;
+    this.speedStep = 100; // By how much you speed up when click on button upgrade.
     this.radius = 100;
     this.effect = "none";
     this.bullet_radius = 5;
     this.bullet_color = 0xf4fc03;
     this.bullet_speed = 1;
     this.bullet_splashRadius = 0;
+    this.bullet_slowCoefficient = 0;
     this.shotTimeElapsed = 0;
     this.detailTooltip = null;
     this.detailButtonUpgrade = null;
@@ -39,24 +40,26 @@ class Tower2 extends PIXI.Sprite {
         this.effect = "splash";
         this.bullet_radius = 5;
         this.bullet_color = 0x996863;
-        this.bullet_speed = 1.3;
+        this.bullet_speed = 2.4;
         this.cost = 10;
         this.maxSpeed = 200;
         this.bullet_splashRadius = 25;
+        this.bullet_slowCoefficient = 0;
         break;
 
       case "slow":
         this.damage = 2;
-        this.speed = 3000;
+        this.speed = 2500;
         this.speedStep = 200;
         this.radius = 100;
         this.effect = "slow";
         this.bullet_radius = 7;
         this.bullet_color = 0x85b4f2;
-        this.bullet_speed = 1.2;
+        this.bullet_speed = 2;
         this.cost = 15;
         this.maxSpeed = 300;
         this.bullet_splashRadius = 0;
+        this.bullet_slowCoefficient = 0.2;
         break;
 
       default: // "standard"
@@ -67,10 +70,11 @@ class Tower2 extends PIXI.Sprite {
         this.effect = "none";
         this.bullet_radius = 3.5;
         this.bullet_color = 0x56a843;
-        this.bullet_speed = 1;
+        this.bullet_speed = 2.8;
         this.cost = 5;
         this.maxSpeed = 100;
         this.bullet_splashRadius = 0;
+        this.bullet_slowCoefficient = 0;
         break;
     }
 
@@ -252,7 +256,8 @@ class Tower2 extends PIXI.Sprite {
         this.bullet_radius,
         this.bullet_color,
         this.damage,
-        this.bullet_splashRadius
+        this.bullet_splashRadius,
+        this.bullet_slowCoefficient
       );
     }
   }

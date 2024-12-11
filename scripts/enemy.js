@@ -24,11 +24,22 @@ class Enemy extends PIXI.Graphics {
 
     this.finished = false;
     this.timeElapsed = 0;
+    this.initialSpeed = this.speed;
+    this.minimalSpeed = 0.2;
+    this.freezeElapsed = 0;
+    this.freezeRecover = 5000;
 
     this.drawEnemy();
   }
 
   move(deltaMS) {
+    this.freezeElapsed += deltaMS;
+
+    if (this.freezeElapsed > this.freezeRecover) {
+      this.speed = this.initialSpeed;
+      this.freezeElapsed = 0;
+    }
+
     let new_x;
     let new_y;
 
@@ -149,7 +160,11 @@ class Enemy extends PIXI.Graphics {
     this.fill(0xfa0707);
   }
 
-  hit(damage) {
+  hit(damage, slow) {
+    if (this.speed - slow > this.minimalSpeed) {
+      this.speed = this.speed - slow;
+    }
+
     this.health = this.health - damage;
 
     this.clear();
