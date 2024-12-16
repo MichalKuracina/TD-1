@@ -1,4 +1,4 @@
-const paneSprites = {
+const towerSprites = {
   frames: {
     standard: {
       frame: { x: 0, y: 0, w: 64, h: 64 },
@@ -22,7 +22,7 @@ const paneSprites = {
     },
   },
   meta: {
-    image: "/assets/spritesheet3.png",
+    image: "/assets/tower-spritesheet.png",
     size: { w: 256, h: 64 },
   },
 };

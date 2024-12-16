@@ -1,51 +1,7 @@
 async function path(routeObj, pathTiles) {
-  //   if (routeObj.length === 1) {
-  //     return;
-  //   }
-
-  //   console.log(routeObj);
-  const atlasData = {
-    frames: {
-      roadH: {
-        frame: { x: 128, y: 0, w: 64, h: 64 },
-        sourceSize: { w: 64, h: 64 },
-        spriteSourceSize: { x: 0, y: 0, w: 64, h: 64 },
-      },
-      roadV: {
-        frame: { x: 192, y: 0, w: 64, h: 64 },
-        sourceSize: { w: 64, h: 64 },
-        spriteSourceSize: { x: 0, y: 0, w: 64, h: 64 },
-      },
-      q3curve: {
-        frame: { x: 64, y: 64, w: 64, h: 64 },
-        sourceSize: { w: 64, h: 64 },
-        spriteSourceSize: { x: 0, y: 0, w: 64, h: 64 },
-      },
-      q4curve: {
-        frame: { x: 0, y: 64, w: 64, h: 64 },
-        sourceSize: { w: 64, h: 64 },
-        spriteSourceSize: { x: 0, y: 0, w: 64, h: 64 },
-      },
-      q2curve: {
-        frame: { x: 128, y: 64, w: 64, h: 64 },
-        sourceSize: { w: 64, h: 64 },
-        spriteSourceSize: { x: 0, y: 0, w: 64, h: 64 },
-      },
-      q1curve: {
-        frame: { x: 192, y: 64, w: 64, h: 64 },
-        sourceSize: { w: 64, h: 64 },
-        spriteSourceSize: { x: 0, y: 0, w: 64, h: 64 },
-      },
-    },
-    meta: {
-      image: "/assets/spritesheet.png",
-      size: { w: 512, h: 192 },
-    },
-  };
-
-  const texture = await PIXI.Assets.load(atlasData.meta.image);
-  const spritesheet = new PIXI.Spritesheet(texture, atlasData);
-  await spritesheet.parse();
+  //   const texture = await PIXI.Assets.load(roadsSprites.meta.image);
+  //   const spritesheet = new PIXI.Spritesheet(texture, roadsSprites);
+  //   await spritesheet.parse();
 
   const spriteWidth = 64;
   let new_x;
@@ -141,9 +97,9 @@ async function path(routeObj, pathTiles) {
   let road;
 
   if (direction === "right" || direction === "left") {
-    road = new PIXI.Sprite(spritesheet.textures.roadH);
+    road = new PIXI.Sprite(roadSpritesheet.textures.roadH);
   } else if (direction === "top" || direction === "bottom") {
-    road = new PIXI.Sprite(spritesheet.textures.roadV);
+    road = new PIXI.Sprite(roadSpritesheet.textures.roadV);
   }
 
   road.position.set(new_x, new_y);
@@ -187,28 +143,28 @@ async function path(routeObj, pathTiles) {
       (direction === "left" && nextDirection === "top") ||
       (direction === "bottom" && nextDirection === "right")
     ) {
-      curve = new PIXI.Sprite(spritesheet.textures.q1curve);
+      curve = new PIXI.Sprite(roadSpritesheet.textures.q1curve);
     }
 
     if (
       (direction === "right" && nextDirection === "top") ||
       (direction === "bottom" && nextDirection === "left")
     ) {
-      curve = new PIXI.Sprite(spritesheet.textures.q2curve);
+      curve = new PIXI.Sprite(roadSpritesheet.textures.q2curve);
     }
 
     if (
       (direction === "right" && nextDirection === "bottom") ||
       (direction === "top" && nextDirection === "left")
     ) {
-      curve = new PIXI.Sprite(spritesheet.textures.q3curve);
+      curve = new PIXI.Sprite(roadSpritesheet.textures.q3curve);
     }
 
     if (
       (direction === "left" && nextDirection === "bottom") ||
       (direction === "top" && nextDirection === "right")
     ) {
-      curve = new PIXI.Sprite(spritesheet.textures.q4curve);
+      curve = new PIXI.Sprite(roadSpritesheet.textures.q4curve);
     }
 
     curve.position.set(new_x, new_y);

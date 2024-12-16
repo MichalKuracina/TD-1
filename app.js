@@ -31,17 +31,15 @@ let enemyCount = 0;
 let hudContainer;
 
 let sprite;
-let texture;
-let spritesheet;
-// let dragTarget = null;
+// let texture;
+let towerSpritesheet;
+let roadSpritesheet;
 
 let gold = 15;
 let dragTarget = null;
 let twrCircle = null;
 let dragTarget_x = 0;
 let dragTarget_y = 0;
-let towerStandardTexture = null;
-// let spritesheet = null;
 
 function run() {
   (async () => {
@@ -54,17 +52,21 @@ function run() {
     });
     document.body.appendChild(app.canvas);
 
+    const roadTexture = await PIXI.Assets.load(roadsSprites.meta.image);
+    roadSpritesheet = new PIXI.Spritesheet(roadTexture, roadsSprites);
+    await roadSpritesheet.parse();
+
+    const towerTexture = await PIXI.Assets.load(towerSprites.meta.image);
+    towerSpritesheet = new PIXI.Spritesheet(towerTexture, towerSprites);
+    await towerSpritesheet.parse();
+
     await grass();
     paths = await path(structuredClone(route), []);
     grid();
 
-    menu = new Menu(gold);
+    menu = new Menu(towerSpritesheet, gold);
     await menu.initMenu();
     app.stage.addChild(menu);
-
-    const texture = await PIXI.Assets.load(paneSprites.meta.image);
-    spritesheet = new PIXI.Spritesheet(texture, paneSprites);
-    await spritesheet.parse();
 
     menu.standardBtn.on("pointerdown", onDragStart, menu.standardBtn);
     menu.splashBtn.on("pointerdown", onDragStart, menu.splashBtn);
@@ -75,17 +77,17 @@ function run() {
 
     app.stage.on("pointerup", onDragEnd);
     app.stage.on("pointerupoutside", onDragEnd);
-    // let turret = new Tower2(towerStandardTexture, 384, 192, "standard");
+    // let turret = new Tower(towerStandardTexture, 384, 192, "standard");
     // app.stage.addChild(turret);
     // towers.push(turret);
 
-    // const towerSplashTexture = new PIXI.Sprite(spritesheet.textures["splash"]);
-    // turret = new Tower2(towerSplashTexture, 384, 192, "splash");
+    // const towerSplashTexture = new PIXI.Sprite(towerSpritesheet.textures["splash"]);
+    // turret = new Tower(towerSplashTexture, 384, 192, "splash");
     // app.stage.addChild(turret);
     // towers.push(turret);
 
-    // const towerSlowTexture = new PIXI.Sprite(spritesheet.textures["slow"]);
-    // turret = new Tower2(towerSlowTexture, 448, 192, "slow");
+    // const towerSlowTexture = new PIXI.Sprite(towerSpritesheet.textures["slow"]);
+    // turret = new Tower(towerSlowTexture, 448, 192, "slow");
     // app.stage.addChild(turret);
     // towers.push(turret);
 
@@ -115,7 +117,7 @@ function run() {
 }
 
 async function onDragStart(event) {
-  dragTarget = new PIXI.Sprite(spritesheet.textures[this.label]);
+  dragTarget = new PIXI.Sprite(towerSpritesheet.textures[this.label]);
   dragTarget.anchor.set(0.5);
   dragTarget.alpha = 0.5;
   dragTarget.label = this.label;
@@ -141,9 +143,9 @@ function onDragEnd(event) {
 
     if (goodToBuild(dragTarget)) {
       const towerTexture = new PIXI.Sprite(
-        spritesheet.textures[dragTarget.label]
+        towerSpritesheet.textures[dragTarget.label]
       );
-      const turret = new Tower2(
+      const turret = new Tower(
         towerTexture,
         event.data.global.x,
         event.data.global.y,

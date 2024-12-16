@@ -31,7 +31,6 @@ class TowerButton extends PIXI.Graphics {
     labelTowerButton.x = this.tower_x + 2;
     labelTowerButton.y = this.tower_y + 2;
     this.addChild(labelTowerButton);
-
     this.eventMode = "none";
   }
 }

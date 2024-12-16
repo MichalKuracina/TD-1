@@ -28,7 +28,7 @@ class TowerToolTip extends PIXI.Graphics {
     this.towerUid = "towerToolTip" + towerUid;
     this.level = level;
     this.cost = cost;
-    this.toolTipWidth = 95;
+    this.toolTipWidth = 100;
     this.toolTipHeight = 100;
     this.toolTip_x = 0;
     this.toolTip_y = 0;
@@ -123,14 +123,23 @@ class TowerToolTip extends PIXI.Graphics {
     labelLevel.y = this.toolTip_y + 17;
     this.addChild(labelLevel);
 
-    const lebelCost = new PIXI.BitmapText({
-      text: `Cost: ${this.cost}`,
+    const labelCost = new PIXI.BitmapText({
+      text: `Cost : ${this.cost}`,
       style: fontStyle,
     });
 
-    lebelCost.x = this.toolTip_x + 5;
-    lebelCost.y = this.toolTip_y + 30;
-    this.addChild(lebelCost);
+    labelCost.x = this.toolTip_x + 5;
+    labelCost.y = this.toolTip_y + 30;
+    this.addChild(labelCost);
+
+    // const labelCostToUpgrade = new PIXI.BitmapText({
+    //   text: `Upgrade Cost: ${this.upgradeCost}`,
+    //   style: fontStyle,
+    // });
+
+    // labelCostToUpgrade.x = this.toolTip_x + 5;
+    // labelCostToUpgrade.y = this.toolTip_y + 43;
+    // this.addChild(labelCostToUpgrade);
 
     const labelDamage = new PIXI.BitmapText({
       text: `Damage: ${this.damage}`,

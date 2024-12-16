@@ -1,22 +1,33 @@
-class Tower extends PIXI.Container {
-  constructor(x = 0, y = 0, type = "standard") {
-    super();
+class Tower extends PIXI.Sprite {
+  constructor(texture, x = 0, y = 0, type = "standard", active = false) {
+    super(texture);
     this.x = x;
     this.y = y;
     this.type = type;
+    this.active = active;
+    this.level = 1;
     this.damage = 1;
     this.speed = 1000;
+    this.rateOfFire = this.speed;
+    this.maxSpeed = 100;
+    this.speedStep = 100; // By how much you speed up when click on button upgrade.
     this.radius = 100;
     this.effect = "none";
     this.bullet_radius = 5;
     this.bullet_color = 0xf4fc03;
     this.bullet_speed = 1;
+    this.bullet_splashRadius = 0;
+    this.bullet_slowCoefficient = 0;
     this.shotTimeElapsed = 0;
     this.detailTooltip = null;
     this.detailButtonUpgrade = null;
     this.detailButtonSell = null;
     this.cost = 5;
-    this.cursorEntered = false;
+    this.upgradeCost = 1;
+    this.towerToolTip = null;
+    this.towerCircle = null;
+    this.towerButtonUpgdare = null;
+    this.towerButtonSell = null;
 
     this.initTower();
   }
@@ -26,158 +37,246 @@ class Tower extends PIXI.Container {
       case "splash":
         this.damage = 3;
         this.speed = 2000;
+        this.speedStep = 150;
         this.radius = 200;
         this.effect = "splash";
         this.bullet_radius = 5;
         this.bullet_color = 0x996863;
-        this.bullet_speed = 1;
+        this.bullet_speed = 2.4;
         this.cost = 10;
+        this.maxSpeed = 200;
+        this.bullet_splashRadius = 25;
+        this.bullet_slowCoefficient = 0;
+        this.upgradeCost = 2;
         break;
 
       case "slow":
         this.damage = 2;
-        this.speed = 3000;
+        this.speed = 2500;
+        this.speedStep = 200;
         this.radius = 100;
         this.effect = "slow";
         this.bullet_radius = 7;
         this.bullet_color = 0x85b4f2;
-        this.bullet_speed = 1;
+        this.bullet_speed = 2;
         this.cost = 15;
+        this.maxSpeed = 300;
+        this.bullet_splashRadius = 0;
+        this.bullet_slowCoefficient = 0.2;
+        this.upgradeCost = 3;
         break;
 
       default: // "standard"
         this.damage = 1;
         this.speed = 1000;
+        this.speedStep = 100;
         this.radius = 300;
         this.effect = "none";
         this.bullet_radius = 3.5;
         this.bullet_color = 0x56a843;
-        this.bullet_speed = 1;
+        this.bullet_speed = 2.8;
         this.cost = 5;
+        this.maxSpeed = 100;
+        this.bullet_splashRadius = 0;
+        this.bullet_slowCoefficient = 0;
+        this.upgradeCost = 1;
         break;
     }
 
-    const texture = await PIXI.Assets.load(paneSprites.meta.image);
-    const spritesheet = new PIXI.Spritesheet(texture, paneSprites);
-    await spritesheet.parse();
-    this.sprite = new PIXI.Sprite(spritesheet.textures[this.type]);
-    app.stage.addChild(this.sprite);
-
-    this.sprite.position.set(this.x, this.y);
-    this.sprite.anchor.set(0.5);
-    this.sprite.label = this.type;
-    this.sprite.eventMode = "static";
+    this.position.set(this.x, this.y);
+    this.anchor.set(0.5);
+    this.label = this.type;
+    this.name = this.type;
     this.eventMode = "static";
 
-    this.sprite.on("pointerenter", (event) => {
-      if (this.cursorEntered) {
-        return;
-      }
+    this.on("pointerdown", this.clickOptions);
 
-      this.cursorEntered = true;
-
-      this.detailTooltip = new TowerDetail(
-        this.x,
-        this.y,
-        this.type,
-        this.damage,
-        this.speed,
-        this.radius,
-        this.effect,
-        this.bullet_color,
-        this.sprite.width,
-        this.sprite.height
-      );
-
-      app.stage.addChild(this.detailTooltip.toolTipContainer);
-
-      //   this.detailButtonUpgrade = new TowerButton(
-      //     this.x - 18,
-      //     this.y - 16,
-      //     this.bullet_color,
-      //     "Upgrade"
-      //   );
-      //   app.stage.addChild(this.detailButtonUpgrade.towerButtonContainer);
-      this.detailButtonSell = new TowerButton(
-        this.x - 18,
-        this.y + 3,
-        this.bullet_color,
-        "Sell"
-      );
-      app.stage.addChild(this.detailButtonSell.towerButtonContainer);
-
-      //   this.detailButtonUpgrade.towerButtonContainer.on("pointerdown", (e) => {
-      //     console.log("upgrade");
-      //     this.damage += 1;
-      //     this.cursorEntered = false;
-
-      //     app.stage.removeChild(this.detailTooltip.toolTipContainer);
-      //     this.detailTooltip.toolTipContainer.destroy();
-
-      //     app.stage.removeChild(this.detailButtonUpgrade.towerButtonContainer);
-      //     this.detailButtonUpgrade.towerButtonContainer.destroy();
-
-      //     app.stage.removeChild(this.detailButtonSell.towerButtonContainer);
-      //     this.detailButtonSell.towerButtonContainer.destroy();
-      //   });
+    this.on("pointerenter", (event) => {
+      this.addTowerSprites();
     });
 
-    this.sprite.on("pointerleave", (event) => {
-      const mousePosition = event.data.global;
-      if (
-        mousePosition.x > this.x - 32 &&
-        mousePosition.x < this.x + 32 &&
-        mousePosition.y < this.y + 32 &&
-        mousePosition.y > this.y - 32
-      ) {
-        return;
+    this.on("pointerleave", (event) => {
+      this.destroyTowerSprites();
+    });
+
+    if (this.active) {
+      menu.substractGold(this.cost);
+    }
+  }
+
+  clickOptions(event) {
+    const buttonOption = this.checkTowerButtonClicked(
+      event.data.global,
+      this.uid
+    );
+
+    switch (buttonOption) {
+      case "upgrade":
+        this.upgrade();
+        this.destroyTowerSprites();
+        this.addTowerSprites();
+        break;
+      case "sell":
+        app.stage.removeChild(this);
+        this.destroy();
+
+        const towerIndex = towers.findIndex((obj) => obj["uid"] === this.uid);
+        towers.splice(towerIndex, 1);
+        this.destroyTowerSprites();
+        menu.addGold(this.cost);
+        break;
+
+      default:
+        // Do nothing.
+        break;
+    }
+  }
+
+  addTowerSprites() {
+    // Add circle.
+    this.towerCircle = new TowerCircle(
+      this.x,
+      this.y,
+      this.radius,
+      this.bullet_color
+    );
+    app.stage.addChild(this.towerCircle);
+
+    // Add tooltip.
+    this.towerToolTip = new TowerToolTip(
+      this.x,
+      this.y,
+      this.type,
+      this.damage,
+      this.speed,
+      this.radius,
+      this.effect,
+      this.bullet_color,
+      this.width,
+      this.height,
+      this.uid,
+      this.level,
+      this.cost,
+      this.upgradeCost
+    );
+    app.stage.addChild(this.towerToolTip);
+
+    if (this.active) {
+      //   // Add upgrade button.
+
+      if (this.cost + this.upgradeCost <= menu.gold) {
+        this.addUpgradeButton();
+      }
+      // Add sell button.
+      this.towerButtonSell = new TowerButton(
+        this.x - 16,
+        this.y + 5,
+        this.bullet_color,
+        "Sell",
+        "sell" + this.uid
+      );
+      app.stage.addChild(this.towerButtonSell);
+    }
+  }
+
+  addUpgradeButton() {
+    // Add upgrade button.
+    this.towerButtonUpgdare = new TowerButton(
+      this.x - 16,
+      this.y - 14,
+      this.bullet_color,
+      "Upgrade",
+      "upgrade" + this.uid
+    );
+
+    app.stage.addChild(this.towerButtonUpgdare);
+  }
+
+  removeUpgradeButton() {
+    app.stage.removeChild(this.towerButtonUpgdare);
+    this.towerButtonUpgdare.destroy();
+  }
+
+  destroyTowerSprites() {
+    // Destroy tooltip.
+    app.stage.removeChild(this.towerToolTip);
+    this.towerToolTip.destroy();
+    // Destroy circle.
+    app.stage.removeChild(this.towerCircle);
+    this.towerCircle.destroy();
+    if (this.active) {
+      if (this.towerButtonUpgdare) {
+        // Destroy upgrade button.
+        app.stage.removeChild(this.towerButtonUpgdare);
+        this.towerButtonUpgdare.destroy();
       }
 
-      this.cursorEntered = false;
+      // Destroy sell button.
+      app.stage.removeChild(this.towerButtonSell);
+      this.towerButtonSell.destroy();
+    }
+  }
 
-      app.stage.removeChild(this.detailTooltip.toolTipContainer);
-      this.detailTooltip.toolTipContainer.destroy();
+  upgrade() {
+    this.damage += 1;
+    this.radius += 10;
+    menu.substractGold(this.cost);
+    this.cost = this.upgradeCost + this.cost;
 
-      //   app.stage.removeChild(this.detailButtonUpgrade.towerButtonContainer);
-      //   this.detailButtonUpgrade.towerButtonContainer.destroy();
+    if (this.rateOfFire - this.speedStep > this.maxSpeed) {
+      this.speed += this.speedStep;
+      this.level += 1;
+      this.rateOfFire -= this.speedStep;
+    }
+  }
 
-      app.stage.removeChild(this.detailButtonSell.towerButtonContainer);
-      this.detailButtonSell.towerButtonContainer.destroy();
+  checkTowerButtonClicked(pointerPosition, towerUid) {
+    const hitObjects = app.stage.children.filter((item) => {
+      if (item) {
+        return (
+          pointerPosition.x > item.tower_x &&
+          pointerPosition.x < item.tower_x + item.width &&
+          pointerPosition.y > item.tower_y &&
+          pointerPosition.y < item.tower_y + item.height &&
+          (item.label === "upgrade" + towerUid ||
+            item.label === "sell" + towerUid)
+        );
+      }
     });
+
+    if (hitObjects.length === 0 || hitObjects.length > 1) {
+      return "";
+    } else {
+      return hitObjects[0].text.toLowerCase();
+    }
   }
 
   rotateTower(x, y) {
-    const dx = x - this.sprite.x;
-    const dy = y - this.sprite.y;
+    const dx = x - this.x;
+    const dy = y - this.y;
     const angle = Math.atan2(dy, dx);
     const rotationOffset = Math.PI / 2;
-    this.sprite.rotation = angle + rotationOffset;
+    this.rotation = angle + rotationOffset;
   }
 
-  shoot(enemy) {
-    const enemy_x = enemy.x;
-    const enemy_y = enemy.y;
-    return new Bullet(
-      this.x,
-      this.y,
-      this.x,
-      this.y,
-      enemy_x,
-      enemy_y,
-      this.bullet_speed,
-      this.bullet_radius,
-      this.bullet_color,
-      this.damage
-    );
-  }
-
-  shoot2(enemy, deltaMS) {
+  shoot(enemy, deltaMS) {
     this.shotTimeElapsed += deltaMS;
 
-    if (this.shotTimeElapsed >= this.speed) {
+    if (this.shotTimeElapsed >= this.rateOfFire) {
+      //   console.log(this.shotTimeElapsed);
       this.shotTimeElapsed = 0;
       const enemy_x = enemy.x;
       const enemy_y = enemy.y;
+
+      const dx = Math.abs(enemy_x - this.x);
+      const dy = Math.abs(enemy_y - this.y);
+      const distance = Math.sqrt(dx * dx + dy * dy);
+
+      if (distance > this.radius) {
+        // Don't shoot. Target is out of range.
+        return;
+      }
+
       return new Bullet(
         this.x,
         this.y,
@@ -188,12 +287,14 @@ class Tower extends PIXI.Container {
         this.bullet_speed,
         this.bullet_radius,
         this.bullet_color,
-        this.damage
+        this.damage,
+        this.bullet_splashRadius,
+        this.bullet_slowCoefficient
       );
     }
   }
 
-  getClosesEnemy(enemies) {
+  getClosestEnemy(enemies) {
     let currentEnemyDistance;
     let closesEnemyDistance;
     let closesEnemyObject;
@@ -244,5 +345,16 @@ class Tower extends PIXI.Container {
     }
     // console.log(closesEnemyObject.x);
     return closesEnemyObject;
+  }
+
+  refreshButtonSprite(gold) {
+    if (gold < this.cost) {
+      this.tint = 0x9c9a95;
+      this.eventMode = "none";
+    } else {
+      this.eventMode = "static";
+      this.cursor = "pointer";
+      this.tint = 16777215;
+    }
   }
 }

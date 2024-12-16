@@ -4,8 +4,8 @@ class MenuButton extends PIXI.Sprite {
     this.label = label;
     this.x = x;
     this.y = y;
-    this.gold = gold;
-    this.price = price;
+    // this.gold = gold;
+    // this.price = price;
 
     this.initMenuButton();
   }
@@ -15,38 +15,28 @@ class MenuButton extends PIXI.Sprite {
     this.anchor.set(0.5);
     // this.label;
 
-    if (this.label !== "coin") {
-      if (this.gold >= this.price) {
-        this.eventMode = "static";
-        this.cursor = "pointer";
-      } else {
-        this.tint = 0x9c9a95;
-        this.eventMode = "none";
-      }
-    }
-
-    const lbl = new MenuButtonLabel(
-      "lbl_" + this.label,
-      this.x,
-      this.y,
-      this.gold,
-      this.price
-    );
-
-    this.addChild(lbl);
+    // if (this.label !== "coin") {
+    //   if (this.gold >= this.price) {
+    //     this.eventMode = "static";
+    //     this.cursor = "pointer";
+    //   } else {
+    //     this.tint = 0x9c9a95;
+    //     this.eventMode = "none";
+    //   }
+    // }
   }
 
-  addGold(amount) {
-    this.gold = this.gold + amount;
-    if (this.gold > 999) {
-      this.gold = 999;
-    }
-  }
+  //   addGold(amount) {
+  //     this.gold = this.gold + amount;
+  //     if (this.gold > 999) {
+  //       this.gold = 999;
+  //     }
+  //   }
 
-  substractGold(amount) {
-    this.gold = this.gold - amount;
-    if (this.gold < 0) {
-      this.gold = 0;
-    }
-  }
+  //   substract(amount) {
+  //     this.gold = this.gold - amount;
+  //     if (this.gold < 0) {
+  //       this.gold = 0;
+  //     }
+  //   }
 }
