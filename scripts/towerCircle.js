@@ -16,4 +16,24 @@ class TowerCircle extends PIXI.Graphics {
     this.fill(this.color);
     this.alpha = 0.3;
   }
+
+  //   changePosition(x, y) {
+  //     this.position.set(x, y);
+  //   }
+
+  //   changeColor(newColor) {
+  //     // console.log("ss");
+  //     this.clear();
+  //     this.circle(this.tower_x, this.tower_y, this.radius);
+  //     this.fill(newColor);
+  //     this.alpha = 0.3;
+  //   }
+
+  update(x, y, newColor) {
+    this.clear();
+    this.circle(this.tower_x, this.tower_y, this.radius);
+    this.position.set(x, y);
+    this.fill(newColor);
+    this.alpha = 0.3;
+  }
 }

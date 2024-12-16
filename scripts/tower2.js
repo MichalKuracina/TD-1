@@ -1,9 +1,10 @@
 class Tower2 extends PIXI.Sprite {
-  constructor(texture, x = 0, y = 0, type = "standard") {
+  constructor(texture, x = 0, y = 0, type = "standard", active = false) {
     super(texture);
     this.x = x;
     this.y = y;
     this.type = type;
+    this.active = active;
     this.level = 1;
     this.damage = 1;
     this.speed = 1000;
@@ -84,34 +85,7 @@ class Tower2 extends PIXI.Sprite {
     this.name = this.type;
     this.eventMode = "static";
 
-    this.on("pointerdown", (event) => {
-      const buttonOption = this.checkTowerButtonClicked(
-        event.data.global,
-        this.uid
-      );
-
-      switch (buttonOption) {
-        case "upgrade":
-          this.upgrade();
-          this.destroyTowerSprites();
-          this.addTowerSprites();
-          break;
-        case "sell":
-          app.stage.removeChild(this);
-          this.destroy();
-
-          const towerIndex = turrets.findIndex(
-            (obj) => obj["uid"] === this.uid
-          );
-          turrets.splice(towerIndex, 1);
-          this.destroyTowerSprites();
-          break;
-
-        default:
-          // Do nothing.
-          break;
-      }
-    });
+    this.on("pointerdown", this.clickOptions);
 
     this.on("pointerenter", (event) => {
       this.addTowerSprites();
@@ -120,6 +94,33 @@ class Tower2 extends PIXI.Sprite {
     this.on("pointerleave", (event) => {
       this.destroyTowerSprites();
     });
+  }
+
+  clickOptions(event) {
+    const buttonOption = this.checkTowerButtonClicked(
+      event.data.global,
+      this.uid
+    );
+
+    switch (buttonOption) {
+      case "upgrade":
+        this.upgrade();
+        this.destroyTowerSprites();
+        this.addTowerSprites();
+        break;
+      case "sell":
+        app.stage.removeChild(this);
+        this.destroy();
+
+        const towerIndex = towers.findIndex((obj) => obj["uid"] === this.uid);
+        towers.splice(towerIndex, 1);
+        this.destroyTowerSprites();
+        break;
+
+      default:
+        // Do nothing.
+        break;
+    }
   }
 
   addTowerSprites() {
@@ -150,25 +151,27 @@ class Tower2 extends PIXI.Sprite {
     );
     app.stage.addChild(this.towerToolTip);
 
-    // Add upgrade button.
-    this.towerButtonUpgdare = new TowerButton(
-      this.x - 16,
-      this.y - 14,
-      this.bullet_color,
-      "Upgrade",
-      "upgrade" + this.uid
-    );
-    app.stage.addChild(this.towerButtonUpgdare);
+    if (this.active) {
+      // Add upgrade button.
+      this.towerButtonUpgdare = new TowerButton(
+        this.x - 16,
+        this.y - 14,
+        this.bullet_color,
+        "Upgrade",
+        "upgrade" + this.uid
+      );
+      app.stage.addChild(this.towerButtonUpgdare);
 
-    // Add sell button.
-    this.towerButtonSell = new TowerButton(
-      this.x - 16,
-      this.y + 5,
-      this.bullet_color,
-      "Sell",
-      "sell" + this.uid
-    );
-    app.stage.addChild(this.towerButtonSell);
+      // Add sell button.
+      this.towerButtonSell = new TowerButton(
+        this.x - 16,
+        this.y + 5,
+        this.bullet_color,
+        "Sell",
+        "sell" + this.uid
+      );
+      app.stage.addChild(this.towerButtonSell);
+    }
   }
 
   destroyTowerSprites() {
@@ -178,12 +181,14 @@ class Tower2 extends PIXI.Sprite {
     // Destroy circle.
     app.stage.removeChild(this.towerCircle);
     this.towerCircle.destroy();
-    // Destroy upgrade button.
-    app.stage.removeChild(this.towerButtonUpgdare);
-    this.towerButtonUpgdare.destroy();
-    // Destroy sell button.
-    app.stage.removeChild(this.towerButtonSell);
-    this.towerButtonSell.destroy();
+    if (this.active) {
+      // Destroy upgrade button.
+      app.stage.removeChild(this.towerButtonUpgdare);
+      this.towerButtonUpgdare.destroy();
+      // Destroy sell button.
+      app.stage.removeChild(this.towerButtonSell);
+      this.towerButtonSell.destroy();
+    }
   }
 
   upgrade() {

@@ -1,12 +1,18 @@
 class Menu extends PIXI.Container {
-  constructor() {
+  constructor(gold) {
     super();
+    this.gold = gold;
+    this.menuIcon1_radius = 300;
+    this.menuIcon2_radius = 200;
+    this.menuIcon3_radius = 100;
+    this.menuIcon1_color = 0x56a843;
+    this.menuIcon2_color = 0x996863;
+    this.menuIcon3_color = 0x85b4f2;
     this.menuIcon1_x = 320;
     this.menuIcon2_x = 384;
     this.menuIcon3_x = 448;
     this.menuIcon4_x = 576;
     this.menuIcon_y = 32;
-    this.initMenu();
   }
 
   async initMenu() {
@@ -24,23 +30,53 @@ class Menu extends PIXI.Container {
       towerSlowTexture,
       coinTexture
     );
-
-    console.log(this.standardBtn);
+    this.label = "menuTile";
   }
 
-  drawMenuBackground() {
-    // Background
-    const backGround = new PIXI.Graphics();
-    backGround.rect(0, 0, canvasWidth, 80);
-    backGround.fill(0x4d3b25);
-    this.addChild(backGround);
-    // Separator
-    const lineSeparator = new PIXI.Graphics();
-    this.addChild(lineSeparator);
-    lineSeparator.moveTo(0, 80);
-    lineSeparator.lineTo(canvasWidth, 80);
-    lineSeparator.stroke({ width: 8, color: 0x2a4d1d, alpha: 1 });
+  drawMenuIcons(
+    towerStandardTexture,
+    towerSplashTexture,
+    towerSlowTexture,
+    coinTexture
+  ) {
+    // Standard button
+    this.standardBtn = new Tower2(
+      towerStandardTexture,
+      this.menuIcon1_x,
+      this.menuIcon_y,
+      "standard",
+      false
+    );
+    this.addChild(this.standardBtn);
+    // Splash button
+    this.splashBtn = new Tower2(
+      towerSplashTexture,
+      this.menuIcon2_x,
+      this.menuIcon_y,
+      "splash",
+      false
+    );
+    this.addChild(this.splashBtn);
+    // Slow button
+    this.slowBtn = new Tower2(
+      towerSlowTexture,
+      this.menuIcon3_x,
+      this.menuIcon_y,
+      "slow",
+      false
+    );
+    this.addChild(this.slowBtn);
+    // Coin button
+    this.coinBtn = new MenuButton(
+      coinTexture,
+      "coin",
+      this.menuIcon4_x,
+      this.menuIcon_y,
+      this.gold
+    );
+    this.addChild(this.coinBtn);
   }
+
   async getSprites() {
     // Get buttons sprites
     const texture = await PIXI.Assets.load(paneSprites.meta.image);
@@ -61,50 +97,17 @@ class Menu extends PIXI.Container {
     ];
   }
 
-  drawMenuIcons(
-    towerStandardTexture,
-    towerSplashTexture,
-    towerSlowTexture,
-    coinTexture
-  ) {
-    // Standard button
-    this.standardBtn = new MenuButton(
-      towerStandardTexture,
-      "standard",
-      this.menuIcon1_x,
-      this.menuIcon_y,
-      this.gold,
-      5
-    );
-    this.addChild(this.standardBtn);
-    // Splash button
-    const splashBtn = new MenuButton(
-      towerSplashTexture,
-      "splash",
-      this.menuIcon2_x,
-      this.menuIcon_y,
-      this.gold,
-      10
-    );
-    this.addChild(splashBtn);
-    // Slow button
-    const slowBtn = new MenuButton(
-      towerSlowTexture,
-      "slow",
-      this.menuIcon3_x,
-      this.menuIcon_y,
-      this.gold,
-      15
-    );
-    this.addChild(slowBtn);
-    // Coin button
-    const coinBtn = new MenuButton(
-      coinTexture,
-      "coin",
-      this.menuIcon4_x,
-      this.menuIcon_y,
-      this.gold
-    );
-    this.addChild(coinBtn);
+  drawMenuBackground() {
+    // Background
+    const backGround = new PIXI.Graphics();
+    backGround.rect(0, 0, canvasWidth, 80);
+    backGround.fill(0x4d3b25);
+    this.addChild(backGround);
+    // Separator
+    const lineSeparator = new PIXI.Graphics();
+    lineSeparator.moveTo(0, 80);
+    lineSeparator.lineTo(canvasWidth, 80);
+    lineSeparator.stroke({ width: 8, color: 0x2a4d1d, alpha: 1 });
+    this.addChild(lineSeparator);
   }
 }

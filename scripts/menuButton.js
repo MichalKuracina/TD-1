@@ -1,21 +1,21 @@
 class MenuButton extends PIXI.Sprite {
   constructor(texture, label, x, y, gold, price) {
     super(texture);
-    this.spriteLabel = label;
+    this.label = label;
     this.x = x;
     this.y = y;
     this.gold = gold;
     this.price = price;
 
-    this.initPaneButton();
+    this.initMenuButton();
   }
 
-  async initPaneButton() {
+  initMenuButton() {
     this.position.set(this.x, this.y);
     this.anchor.set(0.5);
-    this.label;
+    // this.label;
 
-    if (this.spriteLabel !== "coin") {
+    if (this.label !== "coin") {
       if (this.gold >= this.price) {
         this.eventMode = "static";
         this.cursor = "pointer";
@@ -24,6 +24,16 @@ class MenuButton extends PIXI.Sprite {
         this.eventMode = "none";
       }
     }
+
+    const lbl = new MenuButtonLabel(
+      "lbl_" + this.label,
+      this.x,
+      this.y,
+      this.gold,
+      this.price
+    );
+
+    this.addChild(lbl);
   }
 
   addGold(amount) {

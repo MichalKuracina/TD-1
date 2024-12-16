@@ -13,7 +13,8 @@ const route = [
 ];
 
 let bullets = [];
-let turrets = [];
+let towers = [];
+let paths = [];
 let enemies = [];
 
 let app;
@@ -34,6 +35,14 @@ let texture;
 let spritesheet;
 // let dragTarget = null;
 
+let gold = 15;
+let dragTarget = null;
+let twrCircle = null;
+let dragTarget_x = 0;
+let dragTarget_y = 0;
+let towerStandardTexture = null;
+// let spritesheet = null;
+
 function run() {
   (async () => {
     app = new PIXI.Application();
@@ -46,35 +55,39 @@ function run() {
     document.body.appendChild(app.canvas);
 
     await grass();
-    await path(structuredClone(route));
+    paths = await path(structuredClone(route), []);
     grid();
+
+    menu = new Menu(gold);
+    await menu.initMenu();
+    app.stage.addChild(menu);
+
+    const texture = await PIXI.Assets.load(paneSprites.meta.image);
+    spritesheet = new PIXI.Spritesheet(texture, paneSprites);
+    await spritesheet.parse();
+
+    menu.standardBtn.on("pointerdown", onDragStart, menu.standardBtn);
+    menu.splashBtn.on("pointerdown", onDragStart, menu.splashBtn);
+    menu.slowBtn.on("pointerdown", onDragStart, menu.slowBtn);
 
     app.stage.eventMode = "static";
     app.stage.hitArea = app.screen;
 
-    menu = new Menu();
-    app.stage.addChild(menu);
-
-    // const texture = await PIXI.Assets.load(paneSprites.meta.image);
-    // const spritesheet = new PIXI.Spritesheet(texture, paneSprites);
-    // await spritesheet.parse();
-
-    // const towerStandardTexture = new PIXI.Sprite(
-    //   spritesheet.textures["standard"]
-    // );
+    app.stage.on("pointerup", onDragEnd);
+    app.stage.on("pointerupoutside", onDragEnd);
     // let turret = new Tower2(towerStandardTexture, 384, 192, "standard");
     // app.stage.addChild(turret);
-    // turrets.push(turret);
+    // towers.push(turret);
 
     // const towerSplashTexture = new PIXI.Sprite(spritesheet.textures["splash"]);
     // turret = new Tower2(towerSplashTexture, 384, 192, "splash");
     // app.stage.addChild(turret);
-    // turrets.push(turret);
+    // towers.push(turret);
 
     // const towerSlowTexture = new PIXI.Sprite(spritesheet.textures["slow"]);
     // turret = new Tower2(towerSlowTexture, 448, 192, "slow");
     // app.stage.addChild(turret);
-    // turrets.push(turret);
+    // towers.push(turret);
 
     // let enemy = new Enemy(355, 128, 10, 0xfc0303, 20, 20, 0.5, [
     //   { x: -64, y: 128 },
@@ -101,8 +114,132 @@ function run() {
   })();
 }
 
+async function onDragStart(event) {
+  dragTarget = new PIXI.Sprite(spritesheet.textures[this.label]);
+  dragTarget.anchor.set(0.5);
+  dragTarget.alpha = 0.5;
+  dragTarget.label = this.label;
+  dragTarget.position.set(event.data.global.x, event.data.global.y);
+
+  app.stage.addChild(dragTarget);
+
+  twrCircle = new TowerCircle(
+    event.data.global.x,
+    event.data.global.y,
+    this.radius,
+    this.bullet_color
+  );
+  app.stage.addChild(twrCircle);
+  dragTarget_x = event.data.global.x;
+  dragTarget_y = event.data.global.y;
+  app.stage.on("pointermove", onDragMove);
+}
+
+function onDragEnd(event) {
+  if (dragTarget) {
+    app.stage.off("pointermove", onDragMove);
+
+    if (goodToBuild(dragTarget)) {
+      const towerTexture = new PIXI.Sprite(
+        spritesheet.textures[dragTarget.label]
+      );
+      const turret = new Tower2(
+        towerTexture,
+        event.data.global.x,
+        event.data.global.y,
+        dragTarget.label,
+        true
+      );
+      app.stage.addChild(turret);
+      towers.push(turret);
+    }
+
+    app.stage.removeChild(dragTarget);
+    dragTarget.destroy();
+    dragTarget = null;
+
+    app.stage.removeChild(twrCircle);
+    twrCircle.destroy();
+  }
+}
+
+function onDragMove(event) {
+  if (dragTarget) {
+    if (goodToBuild(dragTarget)) {
+      twrCircle.update(
+        event.data.global.x - dragTarget_x,
+        event.data.global.y - dragTarget_y,
+        0x33cc33
+      );
+    } else {
+      twrCircle.update(
+        event.data.global.x - dragTarget_x,
+        event.data.global.y - dragTarget_y,
+        0xff0000
+      );
+    }
+    dragTarget.position.set(event.data.global.x, event.data.global.y);
+  }
+}
+
+function goodToBuild(dEl) {
+  let result = true;
+
+  const elLeftEdge = dEl.x - dEl.width / 3;
+  const elRightEdge = dEl.x + dEl.width / 3;
+  const elTopEdge = dEl.y - dEl.height / 3;
+  const elBottomEdge = dEl.y + dEl.height / 3;
+
+  paths.forEach((item) => {
+    const itemLeftEdge = item.x - item.width / 4;
+    const itemRightEdge = item.x + item.width / 4;
+    const itemTopEdge = item.y - item.height / 4;
+    const itemBottomEdge = item.y + item.height / 4;
+
+    if (
+      elLeftEdge < itemRightEdge &&
+      elRightEdge > itemLeftEdge &&
+      elBottomEdge > itemTopEdge &&
+      elTopEdge < itemBottomEdge
+    ) {
+      result = false;
+    }
+  });
+
+  if (result) {
+    towers.forEach((item) => {
+      const itemLeftEdge = item.x - item.width / 3;
+      const itemRightEdge = item.x + item.width / 3;
+      const itemTopEdge = item.y - item.height / 3;
+      const itemBottomEdge = item.y + item.height / 3;
+
+      if (
+        elLeftEdge < itemRightEdge &&
+        elRightEdge > itemLeftEdge &&
+        elBottomEdge > itemTopEdge &&
+        elTopEdge < itemBottomEdge
+      ) {
+        result = false;
+      }
+    });
+  }
+
+  if (result) {
+    if (
+      elLeftEdge < 0 ||
+      elRightEdge > canvasWidth ||
+      elBottomEdge > canvasHeight ||
+      elTopEdge < menu.y + menu.height
+    ) {
+      result = false;
+    }
+  }
+
+  return result;
+}
+
 function updateTick(deltaTime) {
-  //   hudContainer.children[0].text = `Turrets: ${turrets.length}`;
+  //   hudContainer.children[0].text = `Turrets: ${towers.length}`;
   //   hudContainer.children[1].text = `Enemies: ${enemies.length}`;
 
   spawnElapsed += deltaTime.deltaMS;
@@ -142,13 +279,13 @@ function updateTick(deltaTime) {
 
   // Rotate and Shoot.
   if (enemies.length > 0) {
-    for (let i = 0; i < turrets.length; i++) {
-      const closestEnemy = turrets[i].getClosestEnemy(enemies);
-      turrets[i].rotateTower(closestEnemy.x, closestEnemy.y);
-      const bullet = turrets[i].shoot(closestEnemy, deltaTime.deltaMS);
+    for (let i = 0; i < towers.length; i++) {
+      const closestEnemy = towers[i].getClosestEnemy(enemies);
+      towers[i].rotateTower(closestEnemy.x, closestEnemy.y);
+      const bullet = towers[i].shoot(closestEnemy, deltaTime.deltaMS);
 
       if (bullet) {
-        bullet.damage = turrets[i].damage;
+        bullet.damage = towers[i].damage;
         app.stage.addChild(bullet);
         bullets.push(bullet);
       }

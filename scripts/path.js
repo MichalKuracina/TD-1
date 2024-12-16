@@ -1,4 +1,4 @@
-async function path(routeObj) {
+async function path(routeObj, pathTiles) {
   //   if (routeObj.length === 1) {
   //     return;
   //   }
@@ -146,9 +146,11 @@ async function path(routeObj) {
     road = new PIXI.Sprite(spritesheet.textures.roadV);
   }
 
-  app.stage.addChild(road);
   road.position.set(new_x, new_y);
   road.anchor.set(0.5);
+  road.label = "roadTile";
+  app.stage.addChild(road);
+  pathTiles.push(road);
 
   routeObj[0].x = new_x;
   routeObj[0].y = new_y;
@@ -209,9 +211,13 @@ async function path(routeObj) {
       curve = new PIXI.Sprite(spritesheet.textures.q4curve);
     }
 
-    app.stage.addChild(curve);
     curve.position.set(new_x, new_y);
     curve.anchor.set(0.5);
+    app.stage.addChild(curve);
+    pathTiles.push(curve);
   }
-  await path(routeObj);
+
+  result = await path(routeObj, pathTiles);
+
+  return pathTiles;
 }
