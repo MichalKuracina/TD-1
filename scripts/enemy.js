@@ -10,7 +10,8 @@ class Enemy extends PIXI.Graphics {
     route = [
       { x: 100, y: 100 },
       { x: 200, y: 100 },
-    ]
+    ],
+    prizeMoney = 1
   ) {
     super();
     this.x = x;
@@ -21,6 +22,7 @@ class Enemy extends PIXI.Graphics {
     this.healthMax = healthMax;
     this.speed = speed;
     this.route = route;
+    this.prizeMoney = prizeMoney;
 
     this.finished = false;
     this.timeElapsed = 0;
@@ -126,7 +128,7 @@ class Enemy extends PIXI.Graphics {
         isInRange(this.x, this.route[1].x, this.speed) &&
         isInRange(this.y, this.route[1].y, this.speed)
       ) {
-        console.log("reached!");
+        // console.log("reached!");
         this.route.shift();
       }
     }
@@ -135,6 +137,8 @@ class Enemy extends PIXI.Graphics {
   drawEnemy() {
     // Enemy
     this.circle(0, 0, this.radius);
+    this.fill(0x000000);
+    this.circle(0, 0, this.radius * 0.9);
     this.fill(this.color);
 
     // Health Bar Container
@@ -171,6 +175,8 @@ class Enemy extends PIXI.Graphics {
 
     // Enemy
     this.circle(0, 0, this.radius);
+    this.fill(0x000000);
+    this.circle(0, 0, this.radius * 0.9);
     this.fill(this.color);
 
     // Health Bar Container

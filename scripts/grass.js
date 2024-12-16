@@ -1,8 +1,4 @@
 async function grass() {
-  //   const texture = await PIXI.Assets.load(roadsSprites.meta.image);
-  //   const spritesheet = new PIXI.Spritesheet(texture, roadsSprites);
-  //   await spritesheet.parse();
-
   const tilesV = Math.floor(canvasHeight / 64) + 1;
   const tilesH = Math.floor(canvasWidth / 64) + 1;
 

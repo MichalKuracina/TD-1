@@ -1,8 +1,4 @@
 async function path(routeObj, pathTiles) {
-  //   const texture = await PIXI.Assets.load(roadsSprites.meta.image);
-  //   const spritesheet = new PIXI.Spritesheet(texture, roadsSprites);
-  //   await spritesheet.parse();
-
   const spriteWidth = 64;
   let new_x;
   let new_y;

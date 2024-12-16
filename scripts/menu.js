@@ -1,8 +1,13 @@
 class Menu extends PIXI.Container {
-  constructor(towerSpritesheet, gold) {
+  constructor(heartSprite, towerSpritesheet, gold, lives, roundsTotal) {
     super();
     this.gold = gold;
-    (this.towerSpritesheet = towerSpritesheet), (this.menuIcon1_radius = 300);
+    this.lives = lives;
+    this.roundsTotal = roundsTotal;
+    this.roundCounter = 1;
+    this.heartSprite = heartSprite;
+    this.towerSpritesheet = towerSpritesheet;
+    this.menuIcon1_radius = 300;
     this.menuIcon2_radius = 200;
     this.menuIcon3_radius = 100;
     this.menuIcon1_color = 0x56a843;
@@ -11,6 +16,8 @@ class Menu extends PIXI.Container {
     this.menuIcon1_price = 5;
     this.menuIcon2_price = 10;
     this.menuIcon3_price = 15;
+    this.roundsLbl_x = 0;
+    this.heartIcon_x = 160;
     this.menuIcon1_x = 320;
     this.menuIcon2_x = 384;
     this.menuIcon3_x = 448;
@@ -46,6 +53,36 @@ class Menu extends PIXI.Container {
     towerSlowTexture,
     coinTexture
   ) {
+    // Rounds
+    this.roundsLbl = new MenuButtonLabel(
+      "rounds",
+      this.roundsLbl_x,
+      this.menuIcon_y,
+      0,
+      0,
+      0,
+      `Rounds: ${this.roundCounter}/${this.roundsTotal}`
+    );
+    this.addChild(this.roundsLbl);
+    // Heart button
+    this.heartBtn = new MenuButton(
+      this.heartSprite,
+      "heart",
+      this.heartIcon_x,
+      this.menuIcon_y
+    );
+    this.addChild(this.heartBtn);
+
+    this.heartLbl = new MenuButtonLabel(
+      "heart",
+      this.heartIcon_x,
+      this.menuIcon_y,
+      this.gold,
+      0,
+      this.lives
+    );
+
+    this.addChild(this.heartLbl);
     // Standard button
     this.standardBtn = new Tower(
       towerStandardTexture,
@@ -120,6 +157,13 @@ class Menu extends PIXI.Container {
     this.addChild(this.coinLbl);
   }
 
+  updateRoundCounter(roundNumber) {
+    this.roundCounter = roundNumber;
+    this.roundsLbl.getChildByLabel(
+      "rounds"
+    ).text = `Rounds: ${this.roundCounter}/${this.roundsTotal}`;
+  }
+
   addGold(amount) {
     this.gold = this.gold + amount;
     if (this.gold > 999) {
@@ -140,6 +184,15 @@ class Menu extends PIXI.Container {
     this.splashBtn.refreshButtonSprite(this.gold);
     this.slowBtn.refreshButtonSprite(this.gold);
     this.coinLbl.getChildByLabel("coin").text = `${this.gold}€`;
+  }
+
+  substractLives(amount) {
+    this.lives = this.lives - amount;
+    if (this.lives < 0) {
+      this.lives = 0;
+    }
+
+    this.heartLbl.getChildByLabel("heart").text = this.lives;
   }
 
   async getSprites() {

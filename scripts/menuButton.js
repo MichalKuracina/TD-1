@@ -13,6 +13,19 @@ class MenuButton extends PIXI.Sprite {
   initMenuButton() {
     this.position.set(this.x, this.y);
     this.anchor.set(0.5);
+
+    if (this.label === "heart") {
+      this.width = 30;
+      this.height = 30;
+    }
+
+    // hearth.anchor.set(0.5);
+    // hearth.x = app.screen.width / 2;
+    // hearth.y = app.screen.height / 2;
+    // hearth.width = 30;
+    // hearth.height = 30;
+    // app.stage.addChild(hearth);
+
     // this.label;
 
     // if (this.label !== "coin") {

@@ -133,6 +133,7 @@ class Tower extends PIXI.Sprite {
   }
 
   addTowerSprites() {
+    this.cursor = "pointer";
     // Add circle.
     this.towerCircle = new TowerCircle(
       this.x,
@@ -156,7 +157,7 @@ class Tower extends PIXI.Sprite {
       this.height,
       this.uid,
       this.level,
-      this.cost,
+      this.cost + this.upgradeCost,
       this.upgradeCost
     );
     app.stage.addChild(this.towerToolTip);

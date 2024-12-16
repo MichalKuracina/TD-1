@@ -21,10 +21,10 @@ let app;
 let menu;
 let bullet;
 
-const spawnInterval = 1000;
+// const spawnInterval = 1000;
 let spawnElapsed = 0;
-const spawnLimit = 0;
-let spawnCounter = 0;
+// const spawnLimit = 0;
+// let spawnCounter = 0;
 
 let towerCount = 0;
 let enemyCount = 0;
@@ -36,6 +36,7 @@ let towerSpritesheet;
 let roadSpritesheet;
 
 let gold = 15;
+let lives = 30;
 let dragTarget = null;
 let twrCircle = null;
 let dragTarget_x = 0;
@@ -60,11 +61,14 @@ function run() {
     towerSpritesheet = new PIXI.Spritesheet(towerTexture, towerSprites);
     await towerSpritesheet.parse();
 
+    const heartTexture = await PIXI.Assets.load("assets/heart.png");
+    const heart = PIXI.Sprite.from(heartTexture);
+
     await grass();
     paths = await path(structuredClone(route), []);
     grid();
 
-    menu = new Menu(towerSpritesheet, gold);
+    menu = new Menu(heart, towerSpritesheet, gold, lives, rounds.length);
     await menu.initMenu();
     app.stage.addChild(menu);
 
@@ -240,30 +244,44 @@ function goodToBuild(dEl) {
   return result;
 }
 
+function spawnEnemy(deltaMS) {
+  if (rounds.length === 0) {
+    // End of spawning enemies..
+    return;
+  }
+
+  const currentRound = rounds[0];
+
+  if (currentRound.enemies === 0) {
+    spawnElapsed = -10000; // Pause in between rounds.
+    rounds.shift();
+    return;
+  }
+
+  spawnElapsed += deltaMS;
+
+  if (spawnElapsed >= currentRound.spawnInterval) {
+    menu.updateRoundCounter(currentRound.round);
+    spawnElapsed = 0;
+    const enemy = new Enemy(
+      route[0].x,
+      route[0].y,
+      currentRound.radius,
+      currentRound.color,
+      currentRound.health,
+      currentRound.health,
+      currentRound.speed,
+      structuredClone(route)
+    );
+    app.stage.addChild(enemy);
+    enemies.push(enemy);
+    currentRound.enemies--;
+  }
+}
 function updateTick(deltaTime) {
   //   hudContainer.children[0].text = `Turrets: ${towers.length}`;
   //   hudContainer.children[1].text = `Enemies: ${enemies.length}`;
-
-  spawnElapsed += deltaTime.deltaMS;
-
-  if (spawnElapsed >= spawnInterval) {
-    spawnElapsed = 0;
-    if (spawnCounter < spawnLimit) {
-      const enemy = new Enemy(
-        route[0].x,
-        route[0].y,
-        10,
-        0xfc0303,
-        5,
-        5,
-        0.5,
-        structuredClone(route)
-      );
-      app.stage.addChild(enemy);
-      enemies.push(enemy);
-      spawnCounter++;
-    }
-  }
+  spawnEnemy(deltaTime.deltaMS);
 
   // Move enemies.
   if (enemies.length > 0) {
@@ -271,6 +289,7 @@ function updateTick(deltaTime) {
       enemies[i].move(deltaTime.deltaMS);
 
       if (enemies[i].finished) {
+        menu.substractLives(1);
         app.stage.removeChild(enemies[i]);
         enemies[i].destroy();
         enemies.splice(i, 1);
@@ -358,6 +377,7 @@ function checkHitEnemy(bullet, enemies) {
       }
 
       if (enemies[i].health <= 0) {
+        menu.addGold(enemies[i].prizeMoney);
         app.stage.removeChild(enemies[i]);
         enemies[i].destroy();
         enemies.splice(i, 1);
