@@ -31,15 +31,20 @@ class Enemy extends PIXI.Graphics {
     this.freezeElapsed = 0;
     this.freezeRecover = 5000;
 
-    this.drawEnemy();
+    this.drawEnemy(this.color);
+    this.drawHealthBar();
   }
 
   move(deltaMS) {
+    // this.clear();
     this.freezeElapsed += deltaMS;
 
     if (this.freezeElapsed > this.freezeRecover) {
+      // Recover from slow/freeze.
       this.speed = this.initialSpeed;
       this.freezeElapsed = 0;
+      this.drawEnemy(this.color);
+      this.drawHealthBar();
     }
 
     let new_x;
@@ -134,12 +139,13 @@ class Enemy extends PIXI.Graphics {
     }
   }
 
-  drawEnemy() {
+  drawEnemy(enemyColor) {
     // Enemy
+    // this.clear();
     this.circle(0, 0, this.radius);
     this.fill(0x000000);
     this.circle(0, 0, this.radius * 0.9);
-    this.fill(this.color);
+    this.fill(enemyColor);
 
     // Health Bar Container
     this.rect(
@@ -149,7 +155,10 @@ class Enemy extends PIXI.Graphics {
       this.radius / 1.5
     );
     this.fill(0xfcfcfc);
+  }
 
+  drawHealthBar() {
+    // this.clear();
     // Health Bar Slip
     let healthWidth =
       (this.radius * 2 - (this.radius / 15) * 2) *
@@ -164,20 +173,32 @@ class Enemy extends PIXI.Graphics {
     this.fill(0xfa0707);
   }
 
-  hit(damage, slow) {
-    if (this.speed - slow > this.minimalSpeed) {
-      this.speed = this.speed - slow;
+  hit(bulletDamage, bulletSlowCoefficient, bulletColor, bulletEffect) {
+    this.health = this.health - bulletDamage;
+    this.drawEnemy(this.color);
+
+    if (bulletEffect === "slow") {
+      if (this.speed - bulletSlowCoefficient > this.minimalSpeed) {
+        // Enemy is under effect of slow.
+        this.speed = this.speed - bulletSlowCoefficient;
+        //   console.log("change color");
+        this.drawEnemy(bulletColor);
+      }
     }
-
-    this.health = this.health - damage;
-
-    this.clear();
-
+    // console.log(bulletEffect);
     // Enemy
-    this.circle(0, 0, this.radius);
-    this.fill(0x000000);
-    this.circle(0, 0, this.radius * 0.9);
-    this.fill(this.color);
+    // if (bulletEffect === "slow") {
+    //   if (this.speed - bulletSlowCoefficient > this.minimalSpeed) {
+    //     // Enemy is under effect of slow.
+    //     this.speed = this.speed - bulletSlowCoefficient;
+    //     //   console.log("change color");
+    //     this.drawEnemy(bulletColor);
+    //   } else {
+    //     this.drawEnemy(this.color);
+    //   }
+    // } else {
+    //   this.drawEnemy(this.color);
+    // }
 
     // Health Bar Container
     this.rect(

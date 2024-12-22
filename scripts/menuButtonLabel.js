@@ -16,41 +16,41 @@ class MenuButtonLabel extends PIXI.Graphics {
     let labelText;
     switch (this.label) {
       case "rounds":
-        this.roundRect(5, -15, 130, 35, 4);
+        this.roundRect(5, -15, 100, 25, 4);
         this.fill(0xeb3440);
-        this.roundRect(7, -13, 126, 31, 3);
+        this.roundRect(7, -13, 96, 21, 3);
         this.fill(0xfaf7f8);
 
         labelText = new PIXI.BitmapText({
           text: this.rounds,
           style: {
-            fontSize: 20,
+            fontSize: 15,
             align: "left",
             fill: 0xfc0303,
           },
           label: this.label,
         });
         labelText.x = 13;
-        labelText.y = -8;
+        labelText.y = -10;
         this.addChild(labelText);
         break;
       case "heart":
-        this.roundRect(30, -15, 60, 35, 4);
+        this.roundRect(40, -20, 60, 25, 4);
         this.fill(0xeb3440);
-        this.roundRect(32, -13, 56, 31, 3);
+        this.roundRect(42, -18, 56, 21, 3);
         this.fill(0xfaf7f8);
 
         labelText = new PIXI.BitmapText({
           text: this.lives,
           style: {
-            fontSize: 20,
+            fontSize: 15,
             align: "left",
             fill: 0xfc0303,
           },
           label: this.label,
         });
-        labelText.x = 37;
-        labelText.y = -8;
+        labelText.x = 60;
+        labelText.y = -15;
         this.addChild(labelText);
         break;
       case "coin":

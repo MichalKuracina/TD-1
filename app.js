@@ -16,10 +16,12 @@ let bullets = [];
 let towers = [];
 let paths = [];
 let enemies = [];
+let explosions = [];
 
 let app;
 let menu;
 let bullet;
+let gamePaused = false;
 
 // const spawnInterval = 1000;
 let spawnElapsed = 0;
@@ -35,7 +37,7 @@ let sprite;
 let towerSpritesheet;
 let roadSpritesheet;
 
-let gold = 15;
+let gold = 100;
 let lives = 30;
 let dragTarget = null;
 let twrCircle = null;
@@ -61,6 +63,15 @@ function run() {
     towerSpritesheet = new PIXI.Spritesheet(towerTexture, towerSprites);
     await towerSpritesheet.parse();
 
+    const playPauseTexture = await PIXI.Assets.load(
+      playPauseSprites.meta.image
+    );
+    playPauseSpritesheet = new PIXI.Spritesheet(
+      playPauseTexture,
+      playPauseSprites
+    );
+    await playPauseSpritesheet.parse();
+
     const heartTexture = await PIXI.Assets.load("assets/heart.png");
     const heart = PIXI.Sprite.from(heartTexture);
 
@@ -68,7 +79,14 @@ function run() {
     paths = await path(structuredClone(route), []);
     grid();
 
-    menu = new Menu(heart, towerSpritesheet, gold, lives, rounds.length);
+    menu = new Menu(
+      heart,
+      towerSpritesheet,
+      gold,
+      lives,
+      rounds.length,
+      playPauseSpritesheet
+    );
     await menu.initMenu();
     app.stage.addChild(menu);
 
@@ -116,8 +134,187 @@ function run() {
     // app.stage.addChild(enemy);
     // enemies.push(enemy);
 
+    menu.playBtn.on("pointerdown", startGame);
+    menu.pauseBtn.on("pointerdown", pauseGame);
+
     app.ticker.add(updateTick);
   })();
+}
+
+function startGame() {
+  gamePaused = false;
+  menu.playBtn.deactivate();
+  menu.pauseBtn.activate();
+}
+
+function pauseGame() {
+  gamePaused = true;
+  menu.playBtn.activate();
+  menu.pauseBtn.deactivate();
+}
+
+function updateTick(deltaTime) {
+  if (gamePaused) {
+    return;
+  }
+  //   hudContainer.children[0].text = `Turrets: ${towers.length}`;
+  //   hudContainer.children[1].text = `Enemies: ${enemies.length}`;
+  spawnEnemy(deltaTime.deltaMS);
+
+  // Move enemies.
+  if (enemies.length > 0) {
+    for (let i = 0; i < enemies.length; i++) {
+      enemies[i].move(deltaTime.deltaMS);
+
+      if (enemies[i].finished) {
+        menu.substractLives(1);
+        app.stage.removeChild(enemies[i]);
+        enemies[i].destroy();
+        enemies.splice(i, 1);
+        i--;
+      }
+    }
+  }
+
+  // Rotate and Shoot.
+  if (enemies.length > 0) {
+    for (let i = 0; i < towers.length; i++) {
+      const closestEnemy = towers[i].getClosestEnemy(enemies);
+      towers[i].rotateTower(closestEnemy.x, closestEnemy.y);
+      const bullet = towers[i].shoot(closestEnemy, deltaTime.deltaMS);
+
+      if (bullet) {
+        // bullet.damage = towers[i].damage;
+        app.stage.addChild(bullet);
+        bullets.push(bullet);
+      }
+    }
+  }
+
+  // Move bullets.
+  for (let i = 0; i < bullets.length; i++) {
+    bullets[i].move();
+
+    if (checkHitEnemy(bullets[i], enemies, deltaTime)) {
+      bullets.splice(i, 1);
+      i--;
+
+      continue;
+    }
+
+    if (checkHitWall(bullets[i])) {
+      app.stage.removeChild(bullets[i]);
+      bullets[i].destroy();
+      bullets.splice(i, 1);
+      i--;
+    }
+  }
+
+  for (let i = 0; i < explosions.length; i++) {
+    explosions[i].explode(deltaTime.deltaMS);
+    if (explosions[i].exlosionFinished === true) {
+      app.stage.removeChild(explosions[i]);
+      explosions[i].destroy();
+      explosions.splice(i, 1);
+      i--;
+    }
+  }
+}
+
+function isInRange(number1, number2, limit) {
+  const lowerLimit = number2 - limit;
+  const upperLimit = number2 + limit;
+  if (number1 >= lowerLimit && number1 <= upperLimit) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+function checkHitEnemy(bullet, enemies, deltaTime) {
+  let hit = false;
+  for (let i = 0; i < enemies.length; i++) {
+    const dx = Math.abs(bullet.position_x - enemies[i].x);
+    const dy = Math.abs(bullet.position_y - enemies[i].y);
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    if (distance <= bullet.radius + enemies[i].radius) {
+      app.stage.removeChild(bullet);
+      bullet.destroy();
+
+      // Hit primary target.
+
+      enemies[i].hit(
+        bullet.damage,
+        bullet.slowCoefficient,
+        bullet.color,
+        bullet.effect
+      );
+      const explosion = new Explosion(
+        bullet.position_x,
+        bullet.position_y,
+        bullet.splashRadius,
+        bullet.color
+      );
+      app.stage.addChild(explosion);
+      explosions.push(explosion);
+
+      const secondaryTargets = enemies.filter(
+        (enm) => enm.uid !== enemies[i].uid
+      );
+
+      // Hit secondary targets (splash).
+      for (let j = 0; j < secondaryTargets.length; j++) {
+        const sx = Math.abs(bullet.position_x - secondaryTargets[j].x);
+        const sy = Math.abs(bullet.position_y - secondaryTargets[j].y);
+        const splashDistance = Math.sqrt(sx * sx + sy * sy);
+
+        if (
+          splashDistance <=
+          bullet.splashRadius + secondaryTargets[j].radius
+        ) {
+          secondaryTargets[j].hit(bullet.splashDamage, bullet.slowCoefficient);
+        }
+      }
+
+      if (enemies[i].health <= 0) {
+        menu.addGold(enemies[i].prizeMoney);
+        app.stage.removeChild(enemies[i]);
+        enemies[i].destroy();
+        enemies.splice(i, 1);
+
+        // Rerender tower sprites to stay up to date with gold amount.
+        const activeToolTip = towers.filter((tower) => {
+          return tower.towerToolTip.toolTipActive === true;
+        });
+        if (activeToolTip.length === 1) {
+          activeToolTip[0].destroyTowerSprites();
+          activeToolTip[0].addTowerSprites();
+        }
+      }
+
+      hit = true;
+    }
+  }
+  return hit;
+}
+
+function checkHitWall(bullet) {
+  const maxX = bullet.getBounds().maxX;
+  const maxY = bullet.getBounds().maxY;
+  const minX = bullet.getBounds().minX;
+  const minY = bullet.getBounds().minY;
+
+  if (
+    minY > app.screen.height ||
+    maxY < 0 ||
+    maxX < 0 ||
+    minX > app.screen.width
+  ) {
+    return true;
+  }
+
+  return false;
 }
 
 async function onDragStart(event) {
@@ -277,132 +474,4 @@ function spawnEnemy(deltaMS) {
     enemies.push(enemy);
     currentRound.enemies--;
   }
-}
-function updateTick(deltaTime) {
-  //   hudContainer.children[0].text = `Turrets: ${towers.length}`;
-  //   hudContainer.children[1].text = `Enemies: ${enemies.length}`;
-  spawnEnemy(deltaTime.deltaMS);
-
-  // Move enemies.
-  if (enemies.length > 0) {
-    for (let i = 0; i < enemies.length; i++) {
-      enemies[i].move(deltaTime.deltaMS);
-
-      if (enemies[i].finished) {
-        menu.substractLives(1);
-        app.stage.removeChild(enemies[i]);
-        enemies[i].destroy();
-        enemies.splice(i, 1);
-        i--;
-      }
-    }
-  }
-
-  // Rotate and Shoot.
-  if (enemies.length > 0) {
-    for (let i = 0; i < towers.length; i++) {
-      const closestEnemy = towers[i].getClosestEnemy(enemies);
-      towers[i].rotateTower(closestEnemy.x, closestEnemy.y);
-      const bullet = towers[i].shoot(closestEnemy, deltaTime.deltaMS);
-
-      if (bullet) {
-        bullet.damage = towers[i].damage;
-        app.stage.addChild(bullet);
-        bullets.push(bullet);
-      }
-    }
-  }
-
-  // Move bullets.
-  for (let i = 0; i < bullets.length; i++) {
-    bullets[i].move();
-
-    if (checkHitEnemy(bullets[i], enemies)) {
-      bullets.splice(i, 1);
-      i--;
-
-      continue;
-    }
-
-    if (checkHitWall(bullets[i])) {
-      app.stage.removeChild(bullets[i]);
-      bullets[i].destroy();
-      bullets.splice(i, 1);
-      i--;
-    }
-  }
-}
-
-function isInRange(number1, number2, limit) {
-  const lowerLimit = number2 - limit;
-  const upperLimit = number2 + limit;
-  if (number1 >= lowerLimit && number1 <= upperLimit) {
-    return true;
-  } else {
-    return false;
-  }
-}
-
-function checkHitEnemy(bullet, enemies) {
-  let hit = false;
-  for (let i = 0; i < enemies.length; i++) {
-    const dx = Math.abs(bullet.position_x - enemies[i].x);
-    const dy = Math.abs(bullet.position_y - enemies[i].y);
-    const distance = Math.sqrt(dx * dx + dy * dy);
-
-    if (distance <= bullet.radius + enemies[i].radius) {
-      app.stage.removeChild(bullet);
-      bullet.destroy();
-
-      // Hit primary target.
-
-      enemies[i].hit(bullet.damage, bullet.slowCoefficient);
-
-      const secondaryTargets = enemies.filter(
-        (enm) => enm.uid !== enemies[i].uid
-      );
-
-      // Hit secondary targets (splash).
-      for (let j = 0; j < secondaryTargets.length; j++) {
-        const sx = Math.abs(bullet.position_x - secondaryTargets[j].x);
-        const sy = Math.abs(bullet.position_y - secondaryTargets[j].y);
-        const splashDistance = Math.sqrt(sx * sx + sy * sy);
-
-        if (
-          splashDistance <=
-          bullet.splashRadius + secondaryTargets[j].radius
-        ) {
-          secondaryTargets[j].hit(bullet.splashDamage, bullet.slowCoefficient);
-        }
-      }
-
-      if (enemies[i].health <= 0) {
-        menu.addGold(enemies[i].prizeMoney);
-        app.stage.removeChild(enemies[i]);
-        enemies[i].destroy();
-        enemies.splice(i, 1);
-      }
-
-      hit = true;
-    }
-  }
-  return hit;
-}
-
-function checkHitWall(bullet) {
-  const maxX = bullet.getBounds().maxX;
-  const maxY = bullet.getBounds().maxY;
-  const minX = bullet.getBounds().minX;
-  const minY = bullet.getBounds().minY;
-
-  if (
-    minY > app.screen.height ||
-    maxY < 0 ||
-    maxX < 0 ||
-    minX > app.screen.width
-  ) {
-    return true;
-  }
-
-  return false;
 }

@@ -93,10 +93,14 @@ class Tower extends PIXI.Sprite {
 
     this.on("pointerenter", (event) => {
       this.addTowerSprites();
+
+      //   console.log(this.towerToolTip.toolTipActive);
     });
 
     this.on("pointerleave", (event) => {
       this.destroyTowerSprites();
+      this.towerToolTip.deactivate();
+      //   console.log(this.towerToolTip.toolTipActive);
     });
 
     if (this.active) {
@@ -133,6 +137,7 @@ class Tower extends PIXI.Sprite {
   }
 
   addTowerSprites() {
+    // console.log("add");
     this.cursor = "pointer";
     // Add circle.
     this.towerCircle = new TowerCircle(
@@ -161,6 +166,7 @@ class Tower extends PIXI.Sprite {
       this.upgradeCost
     );
     app.stage.addChild(this.towerToolTip);
+    this.towerToolTip.activate();
 
     if (this.active) {
       //   // Add upgrade button.
@@ -199,6 +205,8 @@ class Tower extends PIXI.Sprite {
   }
 
   destroyTowerSprites() {
+    // console.log("destroy");
+
     // Destroy tooltip.
     app.stage.removeChild(this.towerToolTip);
     this.towerToolTip.destroy();
@@ -290,7 +298,8 @@ class Tower extends PIXI.Sprite {
         this.bullet_color,
         this.damage,
         this.bullet_splashRadius,
-        this.bullet_slowCoefficient
+        this.bullet_slowCoefficient,
+        this.effect
       );
     }
   }

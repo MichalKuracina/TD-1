@@ -34,6 +34,7 @@ class TowerToolTip extends PIXI.Graphics {
     this.toolTip_y = 0;
     this.toolTipCorners = 5;
     this.toolTipGap = 5;
+    this.toolTipActive = false;
 
     this.initTowerDetail();
   }
@@ -176,5 +177,13 @@ class TowerToolTip extends PIXI.Graphics {
     labelEffect.x = this.toolTip_x + 5;
     labelEffect.y = this.toolTip_y + 82;
     this.addChild(labelEffect);
+  }
+
+  activate() {
+    this.toolTipActive = true;
+  }
+
+  deactivate() {
+    this.toolTipActive = false;
   }
 }

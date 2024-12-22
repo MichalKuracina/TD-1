@@ -1,5 +1,12 @@
 class Menu extends PIXI.Container {
-  constructor(heartSprite, towerSpritesheet, gold, lives, roundsTotal) {
+  constructor(
+    heartSprite,
+    towerSpritesheet,
+    gold,
+    lives,
+    roundsTotal,
+    playPauseSpritesheet
+  ) {
     super();
     this.gold = gold;
     this.lives = lives;
@@ -7,6 +14,7 @@ class Menu extends PIXI.Container {
     this.roundCounter = 1;
     this.heartSprite = heartSprite;
     this.towerSpritesheet = towerSpritesheet;
+    this.playPauseSpritesheet = playPauseSpritesheet;
     this.menuIcon1_radius = 300;
     this.menuIcon2_radius = 200;
     this.menuIcon3_radius = 100;
@@ -16,13 +24,16 @@ class Menu extends PIXI.Container {
     this.menuIcon1_price = 5;
     this.menuIcon2_price = 10;
     this.menuIcon3_price = 15;
-    this.roundsLbl_x = 0;
-    this.heartIcon_x = 160;
+    this.roundsLbl_x = 180;
+    this.heartIcon_x = 200;
     this.menuIcon1_x = 320;
     this.menuIcon2_x = 384;
     this.menuIcon3_x = 448;
     this.menuIcon4_x = 576;
     this.menuIcon_y = 32;
+    this.paused = true;
+    // this.playBtn = null;
+    // this.pauseBtn = null;
   }
 
   async initMenu() {
@@ -32,13 +43,17 @@ class Menu extends PIXI.Container {
       towerSplashTexture,
       towerSlowTexture,
       coinTexture,
+      playTexture,
+      pauseTexture,
     ] = await this.getSprites();
 
     this.drawMenuIcons(
       towerStandardTexture,
       towerSplashTexture,
       towerSlowTexture,
-      coinTexture
+      coinTexture,
+      playTexture,
+      pauseTexture
     );
     this.label = "menuTile";
 
@@ -51,13 +66,23 @@ class Menu extends PIXI.Container {
     towerStandardTexture,
     towerSplashTexture,
     towerSlowTexture,
-    coinTexture
+    coinTexture,
+    playTexture,
+    pauseTexture
   ) {
+    // Play button
+    this.playBtn = new MenuButton(playTexture, "play", 32, 32);
+    this.playBtn.deactivate();
+    this.addChild(this.playBtn);
+    // Pause button
+    this.pauseBtn = new MenuButton(pauseTexture, "pause", 96, 32);
+    this.pauseBtn.activate();
+    this.addChild(this.pauseBtn);
     // Rounds
     this.roundsLbl = new MenuButtonLabel(
       "rounds",
       this.roundsLbl_x,
-      this.menuIcon_y,
+      this.menuIcon_y + 25,
       0,
       0,
       0,
@@ -69,13 +94,13 @@ class Menu extends PIXI.Container {
       this.heartSprite,
       "heart",
       this.heartIcon_x,
-      this.menuIcon_y
+      this.menuIcon_y / 1.5
     );
     this.addChild(this.heartBtn);
 
     this.heartLbl = new MenuButtonLabel(
       "heart",
-      this.heartIcon_x,
+      this.heartIcon_x - 20,
       this.menuIcon_y,
       this.gold,
       0,
@@ -155,6 +180,14 @@ class Menu extends PIXI.Container {
     );
 
     this.addChild(this.coinLbl);
+
+    // // console.log(this.getChildByLabel("play"));
+    // this.getChildByLabel("play").on("pointerdown", () => {
+    //   // Function Body...
+    // });
+    // this.getChildByLabel("pause").on("pointerdown", this.pauseGame);
+    // // this.playBtn.on("pointerdown", this.startGame);
+    // // this.pauseBtn.on("pointerdown", this.pauseGame);
   }
 
   updateRoundCounter(roundNumber) {
@@ -207,11 +240,19 @@ class Menu extends PIXI.Container {
       this.towerSpritesheet.textures["slow"]
     );
     const coinTexture = new PIXI.Sprite(this.towerSpritesheet.textures["coin"]);
+    const playTexture = new PIXI.Sprite(
+      this.playPauseSpritesheet.textures["play"]
+    );
+    const pauseTexture = new PIXI.Sprite(
+      this.playPauseSpritesheet.textures["pause"]
+    );
     return [
       towerStandardTexture,
       towerSplashTexture,
       towerSlowTexture,
       coinTexture,
+      playTexture,
+      pauseTexture,
     ];
   }
 

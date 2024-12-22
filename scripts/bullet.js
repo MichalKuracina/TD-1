@@ -11,7 +11,8 @@ class Bullet extends PIXI.Graphics {
     color = 0xf4fc03,
     damage = 1,
     splashRadius = 0,
-    slowCoefficient = 0
+    slowCoefficient = 0,
+    effect = "none"
   ) {
     super();
     this.position_x = position_x;
@@ -27,6 +28,7 @@ class Bullet extends PIXI.Graphics {
     this.splashDamage = this.damage / 2;
     this.splashRadius = splashRadius;
     this.slowCoefficient = slowCoefficient;
+    this.effect = effect;
 
     this.distance = 0;
 

@@ -4,6 +4,7 @@ class MenuButton extends PIXI.Sprite {
     this.label = label;
     this.x = x;
     this.y = y;
+    this.cursor = "pointer";
     // this.gold = gold;
     // this.price = price;
 
@@ -14,42 +15,33 @@ class MenuButton extends PIXI.Sprite {
     this.position.set(this.x, this.y);
     this.anchor.set(0.5);
 
-    if (this.label === "heart") {
-      this.width = 30;
-      this.height = 30;
+    switch (this.label) {
+      case "heart":
+        this.width = 15;
+        this.height = 15;
+        break;
+      case "play":
+        this.width = 48;
+        this.height = 48;
+
+        break;
+      case "pause":
+        this.width = 48;
+        this.height = 48;
+        break;
+      default:
+        break;
     }
-
-    // hearth.anchor.set(0.5);
-    // hearth.x = app.screen.width / 2;
-    // hearth.y = app.screen.height / 2;
-    // hearth.width = 30;
-    // hearth.height = 30;
-    // app.stage.addChild(hearth);
-
-    // this.label;
-
-    // if (this.label !== "coin") {
-    //   if (this.gold >= this.price) {
-    //     this.eventMode = "static";
-    //     this.cursor = "pointer";
-    //   } else {
-    //     this.tint = 0x9c9a95;
-    //     this.eventMode = "none";
-    //   }
-    // }
   }
 
-  //   addGold(amount) {
-  //     this.gold = this.gold + amount;
-  //     if (this.gold > 999) {
-  //       this.gold = 999;
-  //     }
-  //   }
+  activate() {
+    this.eventMode = "static";
+    this.cursor = "pointer";
+    this.tint = "0x40eb34";
+  }
 
-  //   substract(amount) {
-  //     this.gold = this.gold - amount;
-  //     if (this.gold < 0) {
-  //       this.gold = 0;
-  //     }
-  //   }
+  deactivate() {
+    this.eventMode = "none";
+    this.tint = "0x808080";
+  }
 }
