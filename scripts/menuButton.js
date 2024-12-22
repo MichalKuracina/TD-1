@@ -1,12 +1,10 @@
 class MenuButton extends PIXI.Sprite {
-  constructor(texture, label, x, y, gold, price) {
+  constructor(texture, label, x, y) {
     super(texture);
     this.label = label;
     this.x = x;
     this.y = y;
     this.cursor = "pointer";
-    // this.gold = gold;
-    // this.price = price;
 
     this.initMenuButton();
   }
@@ -15,6 +13,7 @@ class MenuButton extends PIXI.Sprite {
     this.position.set(this.x, this.y);
     this.anchor.set(0.5);
 
+    // this.filters = new PIXI.BlurFilter({ strength: 8 });
     switch (this.label) {
       case "heart":
         this.width = 15;

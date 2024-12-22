@@ -175,30 +175,14 @@ class Enemy extends PIXI.Graphics {
 
   hit(bulletDamage, bulletSlowCoefficient, bulletColor, bulletEffect) {
     this.health = this.health - bulletDamage;
-    this.drawEnemy(this.color);
 
     if (bulletEffect === "slow") {
       if (this.speed - bulletSlowCoefficient > this.minimalSpeed) {
         // Enemy is under effect of slow.
         this.speed = this.speed - bulletSlowCoefficient;
-        //   console.log("change color");
         this.drawEnemy(bulletColor);
       }
     }
-    // console.log(bulletEffect);
-    // Enemy
-    // if (bulletEffect === "slow") {
-    //   if (this.speed - bulletSlowCoefficient > this.minimalSpeed) {
-    //     // Enemy is under effect of slow.
-    //     this.speed = this.speed - bulletSlowCoefficient;
-    //     //   console.log("change color");
-    //     this.drawEnemy(bulletColor);
-    //   } else {
-    //     this.drawEnemy(this.color);
-    //   }
-    // } else {
-    //   this.drawEnemy(this.color);
-    // }
 
     // Health Bar Container
     this.rect(

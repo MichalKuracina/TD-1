@@ -1,4 +1,4 @@
-function grid() {
+function grid(menuHeight) {
   const line = new PIXI.Graphics();
   app.stage.addChild(line);
 
@@ -38,7 +38,7 @@ function grid() {
     });
 
     text.x = v * 64;
-    text.y = 0;
+    text.y = menuHeight + 10;
 
     app.stage.addChild(text);
   }

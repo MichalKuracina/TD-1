@@ -7,15 +7,14 @@ class Tower extends PIXI.Sprite {
     this.active = active;
     this.level = 1;
     this.damage = 1;
-    this.speed = 1000;
-    this.rateOfFire = this.speed;
+    this.rateOfFire = 1000;
     this.maxSpeed = 100;
-    this.speedStep = 100; // By how much you speed up when click on button upgrade.
+    this.rateOfFire_incrementor = 100; // By how much you speed up when click on button upgrade.
     this.radius = 100;
     this.effect = "none";
     this.bullet_radius = 5;
     this.bullet_color = 0xf4fc03;
-    this.bullet_speed = 1;
+    this.bulletSpeed = 1;
     this.bullet_splashRadius = 0;
     this.bullet_slowCoefficient = 0;
     this.shotTimeElapsed = 0;
@@ -23,11 +22,17 @@ class Tower extends PIXI.Sprite {
     this.detailButtonUpgrade = null;
     this.detailButtonSell = null;
     this.cost = 5;
-    this.upgradeCost = 1;
+    this.cost_incrementor = 1;
     this.towerToolTip = null;
     this.towerCircle = null;
     this.towerButtonUpgdare = null;
     this.towerButtonSell = null;
+    this.next_level = 0;
+    this.next_cost = 0;
+    this.next_damage = 0;
+    this.next_rateOfFire = 0;
+    this.next_bulletSpeed = 0;
+    this.next_radius = 0;
 
     this.initTower();
   }
@@ -35,53 +40,76 @@ class Tower extends PIXI.Sprite {
   async initTower() {
     switch (this.type) {
       case "splash":
-        this.damage = 3;
-        this.speed = 2000;
-        this.speedStep = 150;
-        this.radius = 200;
         this.effect = "splash";
         this.bullet_radius = 5;
         this.bullet_color = 0x996863;
-        this.bullet_speed = 2.4;
-        this.cost = 10;
         this.maxSpeed = 200;
         this.bullet_splashRadius = 25;
         this.bullet_slowCoefficient = 0;
-        this.upgradeCost = 2;
+
+        this.level = 1;
+        this.cost = 10;
+        this.damage = 3;
+        this.rateOfFire = 2000;
+        this.bulletSpeed = 2.4;
+        this.radius = 200;
+
+        this.level_incrementor = 1;
+        this.cost_incrementor = 2;
+        this.damage_incrementor = 2;
+        this.rateOfFire_incrementor = 150;
+        this.bulletSpeed_incrementor = 0.2;
+        this.radius_incrementor = 10;
         break;
 
       case "slow":
-        this.damage = 2;
-        this.speed = 2500;
-        this.speedStep = 200;
-        this.radius = 100;
         this.effect = "slow";
         this.bullet_radius = 7;
         this.bullet_color = 0x85b4f2;
-        this.bullet_speed = 2;
-        this.cost = 15;
         this.maxSpeed = 300;
         this.bullet_splashRadius = 0;
         this.bullet_slowCoefficient = 0.2;
-        this.upgradeCost = 3;
+
+        this.level = 1;
+        this.cost = 15;
+        this.damage = 2;
+        this.rateOfFire = 2500;
+        this.bulletSpeed = 2;
+        this.radius = 100;
+
+        this.level_incrementor = 1;
+        this.cost_incrementor = 3;
+        this.damage_incrementor = 3;
+        this.rateOfFire_incrementor = 200;
+        this.bulletSpeed_incrementor = 0.3;
+        this.radius_incrementor = 15;
         break;
 
       default: // "standard"
-        this.damage = 1;
-        this.speed = 1000;
-        this.speedStep = 100;
-        this.radius = 300;
         this.effect = "none";
         this.bullet_radius = 3.5;
         this.bullet_color = 0x56a843;
-        this.bullet_speed = 2.8;
-        this.cost = 5;
         this.maxSpeed = 100;
         this.bullet_splashRadius = 0;
         this.bullet_slowCoefficient = 0;
-        this.upgradeCost = 1;
+
+        this.level = 1;
+        this.cost = 5;
+        this.damage = 1;
+        this.rateOfFire = 1000;
+        this.bulletSpeed = 2.8;
+        this.radius = 300;
+
+        this.level_incrementor = 1;
+        this.cost_incrementor = 1;
+        this.damage_incrementor = 1;
+        this.rateOfFire_incrementor = 100;
+        this.bulletSpeed_incrementor = 0.1;
+        this.radius_incrementor = 5;
         break;
     }
+
+    this.setNextLevelValues();
 
     this.position.set(this.x, this.y);
     this.anchor.set(0.5);
@@ -93,14 +121,11 @@ class Tower extends PIXI.Sprite {
 
     this.on("pointerenter", (event) => {
       this.addTowerSprites();
-
-      //   console.log(this.towerToolTip.toolTipActive);
     });
 
     this.on("pointerleave", (event) => {
       this.destroyTowerSprites();
       this.towerToolTip.deactivate();
-      //   console.log(this.towerToolTip.toolTipActive);
     });
 
     if (this.active) {
@@ -154,7 +179,7 @@ class Tower extends PIXI.Sprite {
       this.y,
       this.type,
       this.damage,
-      this.speed,
+      this.rateOfFire,
       this.radius,
       this.effect,
       this.bullet_color,
@@ -162,8 +187,14 @@ class Tower extends PIXI.Sprite {
       this.height,
       this.uid,
       this.level,
-      this.cost + this.upgradeCost,
-      this.upgradeCost
+      this.cost,
+      this.bulletSpeed,
+      this.next_level,
+      this.next_cost,
+      this.next_damage,
+      this.next_rateOfFire,
+      this.next_bulletSpeed,
+      this.next_radius
     );
     app.stage.addChild(this.towerToolTip);
     this.towerToolTip.activate();
@@ -171,7 +202,7 @@ class Tower extends PIXI.Sprite {
     if (this.active) {
       //   // Add upgrade button.
 
-      if (this.cost + this.upgradeCost <= menu.gold) {
+      if (this.cost + this.cost_incrementor <= menu.gold) {
         this.addUpgradeButton();
       }
       // Add sell button.
@@ -226,16 +257,29 @@ class Tower extends PIXI.Sprite {
     }
   }
 
-  upgrade() {
-    this.damage += 1;
-    this.radius += 10;
-    menu.substractGold(this.cost);
-    this.cost = this.upgradeCost + this.cost;
+  setNextLevelValues() {
+    this.next_level = this.level + this.level_incrementor;
+    this.next_cost = this.cost + this.cost_incrementor;
+    this.next_damage = this.damage + this.damage_incrementor;
+    this.next_rateOfFire = this.rateOfFire - this.rateOfFire_incrementor;
+    this.next_bulletSpeed = this.bulletSpeed + this.bulletSpeed_incrementor;
+    this.next_radius = this.radius + this.radius_incrementor;
+  }
 
-    if (this.rateOfFire - this.speedStep > this.maxSpeed) {
-      this.speed += this.speedStep;
-      this.level += 1;
-      this.rateOfFire -= this.speedStep;
+  upgrade() {
+    menu.substractGold(this.cost);
+    this.setNextLevelValues();
+
+    this.level = this.next_level;
+    this.cost = this.next_cost;
+    this.damage = this.next_damage;
+    this.rateOfFire = this.next_rateOfFire;
+    this.bulletSpeed = this.next_bulletSpeed;
+    this.radius = this.next_radius;
+
+    if (this.rateOfFire - this.rateOfFire_incrementor > this.maxSpeed) {
+      //   this.rateOfFire += this.rateOfFire_incrementor;
+      this.rateOfFire -= this.rateOfFire_incrementor;
     }
   }
 
@@ -293,7 +337,7 @@ class Tower extends PIXI.Sprite {
         this.y,
         enemy_x,
         enemy_y,
-        this.bullet_speed,
+        this.bulletSpeed,
         this.bullet_radius,
         this.bullet_color,
         this.damage,

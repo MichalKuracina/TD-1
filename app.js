@@ -77,9 +77,12 @@ function run() {
 
     await grass();
     paths = await path(structuredClone(route), []);
-    grid();
+
+    const menuHeight = 80;
+    grid(menuHeight);
 
     menu = new Menu(
+      menuHeight,
       heart,
       towerSpritesheet,
       gold,

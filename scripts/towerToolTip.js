@@ -4,7 +4,7 @@ class TowerToolTip extends PIXI.Graphics {
     y = 0,
     type = "standard",
     damage = 1,
-    speed = 1000,
+    rateOfFire = 1000,
     radius = 100,
     effect = "none",
     color = 0x56a843,
@@ -12,14 +12,21 @@ class TowerToolTip extends PIXI.Graphics {
     towerHeight = 0,
     towerUid = null,
     level = 1,
-    cost = 5
+    cost = 5,
+    bulletSpeed = 1,
+    next_level,
+    next_cost,
+    next_damage,
+    next_rateOfFire,
+    next_bulletSpeed,
+    next_radius
   ) {
     super();
     this.tower_x = x;
     this.tower_y = y;
     this.type = type;
     this.damage = damage;
-    this.speed = speed;
+    this.rateOfFire = rateOfFire;
     this.radius = radius;
     this.effect = effect;
     this.color = color;
@@ -28,8 +35,9 @@ class TowerToolTip extends PIXI.Graphics {
     this.towerUid = "towerToolTip" + towerUid;
     this.level = level;
     this.cost = cost;
-    this.toolTipWidth = 100;
-    this.toolTipHeight = 100;
+    this.bulletSpeed = bulletSpeed;
+    this.toolTipWidth = 120;
+    this.toolTipHeight = 113;
     this.toolTip_x = 0;
     this.toolTip_y = 0;
     this.toolTipCorners = 5;
@@ -152,7 +160,7 @@ class TowerToolTip extends PIXI.Graphics {
     this.addChild(labelDamage);
 
     const labelSpeed = new PIXI.BitmapText({
-      text: `Speed: ${this.speed / 1000}`,
+      text: `Rate of fire: ${this.rateOfFire / 1000}`,
       style: fontStyle,
     });
 
@@ -160,13 +168,22 @@ class TowerToolTip extends PIXI.Graphics {
     labelSpeed.y = this.toolTip_y + 56;
     this.addChild(labelSpeed);
 
+    const labelBulletSpeed = new PIXI.BitmapText({
+      text: `Bullet speed: ${this.bulletSpeed}`,
+      style: fontStyle,
+    });
+
+    labelBulletSpeed.x = this.toolTip_x + 5;
+    labelBulletSpeed.y = this.toolTip_y + 69;
+    this.addChild(labelBulletSpeed);
+
     const labelRadius = new PIXI.BitmapText({
       text: `Radius: ${this.radius}`,
       style: fontStyle,
     });
 
     labelRadius.x = this.toolTip_x + 5;
-    labelRadius.y = this.toolTip_y + 69;
+    labelRadius.y = this.toolTip_y + 82;
     this.addChild(labelRadius);
 
     const labelEffect = new PIXI.BitmapText({
@@ -175,7 +192,7 @@ class TowerToolTip extends PIXI.Graphics {
     });
 
     labelEffect.x = this.toolTip_x + 5;
-    labelEffect.y = this.toolTip_y + 82;
+    labelEffect.y = this.toolTip_y + 95;
     this.addChild(labelEffect);
   }
 

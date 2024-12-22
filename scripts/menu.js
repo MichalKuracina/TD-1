@@ -1,5 +1,6 @@
 class Menu extends PIXI.Container {
   constructor(
+    menuHeight,
     heartSprite,
     towerSpritesheet,
     gold,
@@ -8,6 +9,7 @@ class Menu extends PIXI.Container {
     playPauseSpritesheet
   ) {
     super();
+    this.menuHeight = menuHeight;
     this.gold = gold;
     this.lives = lives;
     this.roundsTotal = roundsTotal;
@@ -167,8 +169,7 @@ class Menu extends PIXI.Container {
       coinTexture,
       "coin",
       this.menuIcon4_x,
-      this.menuIcon_y,
-      this.gold
+      this.menuIcon_y
     );
     this.addChild(this.coinBtn);
 
@@ -180,14 +181,6 @@ class Menu extends PIXI.Container {
     );
 
     this.addChild(this.coinLbl);
-
-    // // console.log(this.getChildByLabel("play"));
-    // this.getChildByLabel("play").on("pointerdown", () => {
-    //   // Function Body...
-    // });
-    // this.getChildByLabel("pause").on("pointerdown", this.pauseGame);
-    // // this.playBtn.on("pointerdown", this.startGame);
-    // // this.pauseBtn.on("pointerdown", this.pauseGame);
   }
 
   updateRoundCounter(roundNumber) {
@@ -259,13 +252,13 @@ class Menu extends PIXI.Container {
   drawMenuBackground() {
     // Background
     const backGround = new PIXI.Graphics();
-    backGround.rect(0, 0, canvasWidth, 80);
+    backGround.rect(0, 0, canvasWidth, this.menuHeight);
     backGround.fill(0x4d3b25);
     this.addChild(backGround);
     // Separator
     const lineSeparator = new PIXI.Graphics();
-    lineSeparator.moveTo(0, 80);
-    lineSeparator.lineTo(canvasWidth, 80);
+    lineSeparator.moveTo(0, this.menuHeight);
+    lineSeparator.lineTo(canvasWidth, this.menuHeight);
     lineSeparator.stroke({ width: 8, color: 0x2a4d1d, alpha: 1 });
     this.addChild(lineSeparator);
   }
