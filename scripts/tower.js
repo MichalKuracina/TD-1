@@ -8,7 +8,7 @@ class Tower extends PIXI.Sprite {
     this.level = 1;
     this.damage = 1;
     this.rateOfFire = 1000;
-    this.maxSpeed = 100;
+    this.maxRateOfFire = 100;
     this.rateOfFire_incrementor = 100; // By how much you speed up when click on button upgrade.
     this.radius = 100;
     this.effect = "none";
@@ -43,7 +43,7 @@ class Tower extends PIXI.Sprite {
         this.effect = "splash";
         this.bullet_radius = 5;
         this.bullet_color = 0x996863;
-        this.maxSpeed = 200;
+        this.maxRateOfFire = 200;
         this.bullet_splashRadius = 25;
         this.bullet_slowCoefficient = 0;
 
@@ -66,7 +66,7 @@ class Tower extends PIXI.Sprite {
         this.effect = "slow";
         this.bullet_radius = 7;
         this.bullet_color = 0x85b4f2;
-        this.maxSpeed = 300;
+        this.maxRateOfFire = 300;
         this.bullet_splashRadius = 0;
         this.bullet_slowCoefficient = 0.2;
 
@@ -89,7 +89,7 @@ class Tower extends PIXI.Sprite {
         this.effect = "none";
         this.bullet_radius = 3.5;
         this.bullet_color = 0x56a843;
-        this.maxSpeed = 100;
+        this.maxRateOfFire = 100;
         this.bullet_splashRadius = 0;
         this.bullet_slowCoefficient = 0;
 
@@ -261,7 +261,10 @@ class Tower extends PIXI.Sprite {
     this.next_level = this.level + this.level_incrementor;
     this.next_cost = this.cost + this.cost_incrementor;
     this.next_damage = this.damage + this.damage_incrementor;
-    this.next_rateOfFire = this.rateOfFire - this.rateOfFire_incrementor;
+    if (this.rateOfFire - this.rateOfFire_incrementor > this.maxRateOfFire) {
+      // Max Rate of fire was not reached
+      this.next_rateOfFire = this.rateOfFire - this.rateOfFire_incrementor;
+    }
     this.next_bulletSpeed = this.bulletSpeed + this.bulletSpeed_incrementor;
     this.next_radius = this.radius + this.radius_incrementor;
   }
@@ -276,11 +279,6 @@ class Tower extends PIXI.Sprite {
     this.rateOfFire = this.next_rateOfFire;
     this.bulletSpeed = this.next_bulletSpeed;
     this.radius = this.next_radius;
-
-    if (this.rateOfFire - this.rateOfFire_incrementor > this.maxSpeed) {
-      //   this.rateOfFire += this.rateOfFire_incrementor;
-      this.rateOfFire -= this.rateOfFire_incrementor;
-    }
   }
 
   checkTowerButtonClicked(pointerPosition, towerUid) {

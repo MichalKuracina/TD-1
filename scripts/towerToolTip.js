@@ -36,13 +36,21 @@ class TowerToolTip extends PIXI.Graphics {
     this.level = level;
     this.cost = cost;
     this.bulletSpeed = bulletSpeed;
-    this.toolTipWidth = 120;
-    this.toolTipHeight = 113;
+    this.toolTipWidth = 120; // arbitrary num
+    this.toolTipHeight = 113; // arbitrary num
     this.toolTip_x = 0;
     this.toolTip_y = 0;
     this.toolTipCorners = 5;
-    this.toolTipGap = 5;
-    this.toolTipActive = false;
+    this.toolTipGap = 5; // gap between tooltip and tower
+    this.toolTipActive = false; // to determine which tooptip to update when gold is changing
+    this.toolTipTextStart = 4; // where the first row starts
+    this.toolTipTextRowOffset = 13; // gap between rows
+    this.next_level = next_level;
+    this.next_cost = next_cost;
+    this.next_damage = next_damage;
+    this.next_rateOfFire = next_rateOfFire;
+    this.next_bulletSpeed = next_bulletSpeed;
+    this.next_radius = next_radius;
 
     this.initTowerDetail();
   }
@@ -88,12 +96,6 @@ class TowerToolTip extends PIXI.Graphics {
         this.toolTipHeight;
     }
 
-    const fontStyle = {
-      fontSize: 12,
-      align: "left",
-      fill: 0x000000,
-    };
-
     this.roundRect(
       this.toolTip_x,
       this.toolTip_y,
@@ -112,88 +114,74 @@ class TowerToolTip extends PIXI.Graphics {
     );
     this.fill(this.color);
 
-    const labelType = new PIXI.BitmapText({
-      text: `Type: ${
-        String(this.type).charAt(0).toUpperCase() + String(this.type).slice(1)
-      }`,
+    this.writeEntry(
+      "Type",
+      String(this.type).charAt(0).toUpperCase() + String(this.type).slice(1),
+      ""
+    );
+    this.writeEntry("Level", this.level, this.next_level);
+    this.writeEntry("Cost", this.cost, this.next_cost);
+    this.writeEntry("Damage", this.damage, this.next_damage);
+    this.writeEntry("Rate of fire", this.rateOfFire, this.next_rateOfFire);
+    this.writeEntry(
+      "Bullet speed",
+      Math.round(this.bulletSpeed * 100) / 100,
+      Math.round(this.next_bulletSpeed * 100) / 100
+    );
+    this.writeEntry("Radius", this.radius, this.next_radius);
+    this.writeEntry("Effect", this.effect, "");
+
+    // console.log(this.next_bulletSpeed);
+  }
+
+  writeEntry(key, value, value2) {
+    console.log(value2);
+    const fontStyle = {
+      fontSize: 12,
+      align: "left",
+      fill: 0x000000, // black
+    };
+
+    const fontStyle2 = {
+      fontSize: 12,
+      align: "left",
+      fill: 0xff0000, // red
+    };
+
+    const lbl = new PIXI.BitmapText({
+      text: `${key}: ${value}`,
       style: fontStyle,
     });
 
-    labelType.x = this.toolTip_x + 5;
-    labelType.y = this.toolTip_y + 4;
-    this.addChild(labelType);
+    lbl.x = this.toolTip_x + 5;
+    lbl.y = this.toolTip_y + this.toolTipTextStart;
 
-    const labelLevel = new PIXI.BitmapText({
-      text: `Level: ${this.level}`,
-      style: fontStyle,
-    });
+    if (value2 !== "") {
+      // 'Next' value must be entered
+      // Opening round brackets
+      const lbl2 = new PIXI.BitmapText({
+        text: "(",
+        style: fontStyle,
+      });
 
-    labelLevel.x = this.toolTip_x + 5;
-    labelLevel.y = this.toolTip_y + 17;
-    this.addChild(labelLevel);
+      lbl2.x = this.toolTip_x + 5 + lbl.width + 5;
+      lbl2.y = this.toolTip_y + this.toolTipTextStart;
+      this.addChild(lbl2);
 
-    const labelCost = new PIXI.BitmapText({
-      text: `Cost : ${this.cost}`,
-      style: fontStyle,
-    });
+      // 'Next' value
+      const lbl3 = new PIXI.BitmapText({
+        text: `${this.value2}`,
+        style: fontStyle2,
+      });
 
-    labelCost.x = this.toolTip_x + 5;
-    labelCost.y = this.toolTip_y + 30;
-    this.addChild(labelCost);
+      lbl3.x = this.toolTip_x + 5 + lbl.width + 5 + 3;
+      lbl3.y = this.toolTip_y + this.toolTipTextStart;
+      this.addChild(lbl3);
+    }
 
-    // const labelCostToUpgrade = new PIXI.BitmapText({
-    //   text: `Upgrade Cost: ${this.upgradeCost}`,
-    //   style: fontStyle,
-    // });
-
-    // labelCostToUpgrade.x = this.toolTip_x + 5;
-    // labelCostToUpgrade.y = this.toolTip_y + 43;
-    // this.addChild(labelCostToUpgrade);
-
-    const labelDamage = new PIXI.BitmapText({
-      text: `Damage: ${this.damage}`,
-      style: fontStyle,
-    });
-
-    labelDamage.x = this.toolTip_x + 5;
-    labelDamage.y = this.toolTip_y + 43;
-    this.addChild(labelDamage);
-
-    const labelSpeed = new PIXI.BitmapText({
-      text: `Rate of fire: ${this.rateOfFire / 1000}`,
-      style: fontStyle,
-    });
-
-    labelSpeed.x = this.toolTip_x + 5;
-    labelSpeed.y = this.toolTip_y + 56;
-    this.addChild(labelSpeed);
-
-    const labelBulletSpeed = new PIXI.BitmapText({
-      text: `Bullet speed: ${this.bulletSpeed}`,
-      style: fontStyle,
-    });
-
-    labelBulletSpeed.x = this.toolTip_x + 5;
-    labelBulletSpeed.y = this.toolTip_y + 69;
-    this.addChild(labelBulletSpeed);
-
-    const labelRadius = new PIXI.BitmapText({
-      text: `Radius: ${this.radius}`,
-      style: fontStyle,
-    });
-
-    labelRadius.x = this.toolTip_x + 5;
-    labelRadius.y = this.toolTip_y + 82;
-    this.addChild(labelRadius);
-
-    const labelEffect = new PIXI.BitmapText({
-      text: `Effect: ${this.effect}`,
-      style: fontStyle,
-    });
-
-    labelEffect.x = this.toolTip_x + 5;
-    labelEffect.y = this.toolTip_y + 95;
-    this.addChild(labelEffect);
+    this.toolTip_y = this.toolTip_y + this.toolTipTextRowOffset;
+    this.addChild(lbl);
+    // console.log(lbl.width);
   }
 
   activate() {
