@@ -37,7 +37,7 @@ let sprite;
 let towerSpritesheet;
 let roadSpritesheet;
 
-let gold = 100;
+let gold = 30;
 let lives = 30;
 let dragTarget = null;
 let twrCircle = null;

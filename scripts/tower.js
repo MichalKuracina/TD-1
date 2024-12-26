@@ -52,7 +52,7 @@ class Tower extends PIXI.Sprite {
         this.damage = 3;
         this.rateOfFire = 2000;
         this.bulletSpeed = 2.4;
-        this.radius = 200;
+        this.radius = 125;
 
         this.level_incrementor = 1;
         this.cost_incrementor = 2;
@@ -98,7 +98,7 @@ class Tower extends PIXI.Sprite {
         this.damage = 1;
         this.rateOfFire = 1000;
         this.bulletSpeed = 2.8;
-        this.radius = 300;
+        this.radius = 200;
 
         this.level_incrementor = 1;
         this.cost_incrementor = 1;
@@ -194,7 +194,8 @@ class Tower extends PIXI.Sprite {
       this.next_damage,
       this.next_rateOfFire,
       this.next_bulletSpeed,
-      this.next_radius
+      this.next_radius,
+      this.active
     );
     app.stage.addChild(this.towerToolTip);
     this.towerToolTip.activate();
@@ -279,6 +280,7 @@ class Tower extends PIXI.Sprite {
     this.rateOfFire = this.next_rateOfFire;
     this.bulletSpeed = this.next_bulletSpeed;
     this.radius = this.next_radius;
+    this.setNextLevelValues();
   }
 
   checkTowerButtonClicked(pointerPosition, towerUid) {

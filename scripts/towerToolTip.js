@@ -36,7 +36,7 @@ class TowerToolTip extends PIXI.Graphics {
     this.level = level;
     this.cost = cost;
     this.bulletSpeed = bulletSpeed;
-    this.toolTipWidth = 120; // arbitrary num
+    this.toolTipWidth = 145; // arbitrary num
     this.toolTipHeight = 113; // arbitrary num
     this.toolTip_x = 0;
     this.toolTip_y = 0;
@@ -51,6 +51,7 @@ class TowerToolTip extends PIXI.Graphics {
     this.next_rateOfFire = next_rateOfFire;
     this.next_bulletSpeed = next_bulletSpeed;
     this.next_radius = next_radius;
+    // this.towerIsActive = false;
 
     this.initTowerDetail();
   }
@@ -130,12 +131,9 @@ class TowerToolTip extends PIXI.Graphics {
     );
     this.writeEntry("Radius", this.radius, this.next_radius);
     this.writeEntry("Effect", this.effect, "");
-
-    // console.log(this.next_bulletSpeed);
   }
 
   writeEntry(key, value, value2) {
-    console.log(value2);
     const fontStyle = {
       fontSize: 12,
       align: "left",
@@ -156,6 +154,7 @@ class TowerToolTip extends PIXI.Graphics {
     lbl.x = this.toolTip_x + 5;
     lbl.y = this.toolTip_y + this.toolTipTextStart;
 
+    // if (this.toolTipActive) {
     if (value2 !== "") {
       // 'Next' value must be entered
       // Opening round brackets
@@ -170,18 +169,27 @@ class TowerToolTip extends PIXI.Graphics {
 
       // 'Next' value
       const lbl3 = new PIXI.BitmapText({
-        text: `${this.value2}`,
+        text: `${value2}`,
         style: fontStyle2,
       });
 
-      lbl3.x = this.toolTip_x + 5 + lbl.width + 5 + 3;
+      lbl3.x = this.toolTip_x + 5 + lbl.width + 10;
       lbl3.y = this.toolTip_y + this.toolTipTextStart;
       this.addChild(lbl3);
-    }
 
+      // Closing round brackets
+      const lbl4 = new PIXI.BitmapText({
+        text: ")",
+        style: fontStyle,
+      });
+
+      lbl4.x = this.toolTip_x + 5 + lbl.width + lbl3.width + 12;
+      lbl4.y = this.toolTip_y + this.toolTipTextStart;
+      this.addChild(lbl4);
+    }
+    // }
     this.toolTip_y = this.toolTip_y + this.toolTipTextRowOffset;
     this.addChild(lbl);
-    // console.log(lbl.width);
   }
 
   activate() {
@@ -191,4 +199,8 @@ class TowerToolTip extends PIXI.Graphics {
   deactivate() {
     this.toolTipActive = false;
   }
+
+  //   setTooltipTowerActive(){
+  //     this.towerIsActive = true;
+  //   }
 }
