@@ -23,6 +23,7 @@ class Enemy extends PIXI.Graphics {
     this.speed = speed;
     this.route = route;
     this.prizeMoney = prizeMoney;
+    this.enemyToolTip = null;
 
     this.finished = false;
     this.timeElapsed = 0;
@@ -31,10 +32,48 @@ class Enemy extends PIXI.Graphics {
     this.freezeElapsed = 0;
     this.freezeRecover = 5000;
 
-    this.drawEnemy(this.color);
-    this.drawHealthBar();
+    this.initEnemy();
   }
 
+  initEnemy() {
+    this.eventMode = "static";
+    this.drawEnemy(this.color);
+    this.drawHealthBar();
+
+    this.on("pointerover", (event) => {
+      this.addTowerSprites();
+    });
+
+    this.on("pointerout", (event) => {
+      this.destroyTowerSprites();
+      // this.towerToolTip.deactivate();
+    });
+  }
+
+  addTowerSprites() {
+    this.cursor = "pointer";
+
+    // Add tooltip.
+    this.enemyToolTip = new EnemyToolTip(
+      this.x,
+      this.y,
+      "Enemy",
+      this.radius,
+      this.color,
+      `${this.health}/${this.healthMax}`,
+      this.speed,
+      this.prizeMoney,
+      this.radius,
+      this.radius
+    );
+    app.stage.addChild(this.enemyToolTip);
+    this.enemyToolTip.activate();
+  }
+  destroyTowerSprites() {
+    // Destroy tooltip.
+    app.stage.removeChild(this.enemyToolTip);
+    this.enemyToolTip.destroy();
+  }
   move(deltaMS) {
     // this.clear();
     this.freezeElapsed += deltaMS;
@@ -141,7 +180,6 @@ class Enemy extends PIXI.Graphics {
 
   drawEnemy(enemyColor) {
     // Enemy
-    // this.clear();
     this.circle(0, 0, this.radius);
     this.fill(0x000000);
     this.circle(0, 0, this.radius * 0.9);
