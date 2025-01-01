@@ -37,7 +37,7 @@ const roadsSprites = {
     },
   },
   meta: {
-    image: "/assets/road-spritesheet.png",
+    image: "/TD-1/assets/road-spritesheet.png",
     size: { w: 512, h: 192 },
   },
 };
