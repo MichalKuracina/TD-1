@@ -22,7 +22,7 @@ const towerSprites = {
     },
   },
   meta: {
-    image: "/assets/tower-spritesheet.png",
+    image: "/TD-1/assets/tower-spritesheet.png",
     size: { w: 256, h: 64 },
   },
 };
