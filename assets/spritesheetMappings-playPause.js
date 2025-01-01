@@ -12,7 +12,7 @@ const playPauseSprites = {
     },
   },
   meta: {
-    image: "/assets/play-pause-spritesheet.png",
+    image: "/TD-1/assets/play-pause-spritesheet.png",
     size: { w: 199, h: 57 },
   },
 };
