@@ -37,7 +37,7 @@ let sprite;
 let towerSpritesheet;
 let roadSpritesheet;
 
-let gold = 30;
+let gold = 15;
 let lives = 30;
 let dragTarget = null;
 let twrCircle = null;
@@ -79,7 +79,7 @@ function run() {
     paths = await path(structuredClone(route), []);
 
     const menuHeight = 80;
-    grid(menuHeight);
+    //grid(menuHeight);
 
     menu = new Menu(
       menuHeight,
