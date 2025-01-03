@@ -117,6 +117,10 @@ class Tower extends PIXI.Sprite {
     this.name = this.type;
     this.eventMode = "static";
 
+    this.addTowerSprites();
+    this.destroyTowerSprites();
+    this.towerToolTip.deactivate();
+
     this.on("pointerdown", this.clickOptions);
 
     this.on("pointerenter", (event) => {

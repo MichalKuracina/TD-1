@@ -102,40 +102,6 @@ function run() {
 
     app.stage.on("pointerup", onDragEnd);
     app.stage.on("pointerupoutside", onDragEnd);
-    // let turret = new Tower(towerStandardTexture, 384, 192, "standard");
-    // app.stage.addChild(turret);
-    // towers.push(turret);
-
-    // const towerSplashTexture = new PIXI.Sprite(towerSpritesheet.textures["splash"]);
-    // turret = new Tower(towerSplashTexture, 384, 192, "splash");
-    // app.stage.addChild(turret);
-    // towers.push(turret);
-
-    // const towerSlowTexture = new PIXI.Sprite(towerSpritesheet.textures["slow"]);
-    // turret = new Tower(towerSlowTexture, 448, 192, "slow");
-    // app.stage.addChild(turret);
-    // towers.push(turret);
-
-    // let enemy = new Enemy(355, 128, 10, 0xfc0303, 20, 20, 0.5, [
-    //   { x: -64, y: 128 },
-    //   { x: canvasWidth + 64, y: 128 },
-    // ]);
-    // app.stage.addChild(enemy);
-    // enemies.push(enemy);
-
-    // enemy = new Enemy(384, 128, 10, 0xfc0303, 20, 20, 0.01, [
-    //   { x: 320, y: 64 },
-    //   { x: 64, y: 64 },
-    // ]);
-    // app.stage.addChild(enemy);
-    // enemies.push(enemy);
-
-    // enemy = new Enemy(410, 128, 10, 0xfc0303, 20, 20, 0.01, [
-    //   { x: 320, y: 64 },
-    //   { x: 64, y: 64 },
-    // ]);
-    // app.stage.addChild(enemy);
-    // enemies.push(enemy);
 
     menu.playBtn.on("pointerdown", startGame);
     menu.pauseBtn.on("pointerdown", pauseGame);
@@ -160,8 +126,7 @@ function updateTick(deltaTime) {
   if (gamePaused) {
     return;
   }
-  //   hudContainer.children[0].text = `Turrets: ${towers.length}`;
-  //   hudContainer.children[1].text = `Enemies: ${enemies.length}`;
+
   spawnEnemy(deltaTime.deltaMS);
 
   // Move enemies.
