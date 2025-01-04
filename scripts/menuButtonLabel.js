@@ -24,13 +24,13 @@ class MenuButtonLabel extends PIXI.Graphics {
         labelText = new PIXI.BitmapText({
           text: this.rounds,
           style: {
-            fontSize: 15,
+            fontSize: 14,
             align: "left",
             fill: 0xfc0303,
           },
           label: this.label,
         });
-        labelText.x = 13;
+        labelText.x = 12;
         labelText.y = -10;
         this.addChild(labelText);
         break;
