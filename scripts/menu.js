@@ -24,8 +24,8 @@ class Menu extends PIXI.Container {
     this.menuIcon2_color = 0x996863;
     this.menuIcon3_color = 0x85b4f2;
     this.menuIcon1_price = 5;
-    this.menuIcon2_price = 10;
-    this.menuIcon3_price = 15;
+    this.menuIcon2_price = 7;
+    this.menuIcon3_price = 6;
     this.roundsLbl_x = 180;
     this.heartIcon_x = 200;
     this.menuIcon1_x = 320;

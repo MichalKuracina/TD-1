@@ -23,17 +23,13 @@ let menu;
 let bullet;
 let gamePaused = false;
 
-// const spawnInterval = 1000;
 let spawnElapsed = 0;
-// const spawnLimit = 0;
-// let spawnCounter = 0;
 
 let towerCount = 0;
 let enemyCount = 0;
 let hudContainer;
 
 let sprite;
-// let texture;
 let towerSpritesheet;
 let roadSpritesheet;
 
@@ -54,6 +50,10 @@ function run() {
       backgroundColor: 0x338a4a,
     });
     document.body.appendChild(app.canvas);
+
+    // roadsSprites.meta.image = "/assets/road-spritesheet.png";
+    // towerSprites.meta.image = "/assets/tower-spritesheet.png";
+    // playPauseSprites.meta.image = "/assets/play-pause-spritesheet.png";
 
     const roadTexture = await PIXI.Assets.load(roadsSprites.meta.image);
     roadSpritesheet = new PIXI.Spritesheet(roadTexture, roadsSprites);

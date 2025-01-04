@@ -48,10 +48,10 @@ class Tower extends PIXI.Sprite {
         this.bullet_slowCoefficient = 0;
 
         this.level = 1;
-        this.cost = 10;
+        this.cost = 7;
         this.damage = 3;
-        this.rateOfFire = 2000;
-        this.bulletSpeed = 2.4;
+        this.rateOfFire = 1500;
+        this.bulletSpeed = 2.5;
         this.radius = 125;
 
         this.level_incrementor = 1;
@@ -71,10 +71,10 @@ class Tower extends PIXI.Sprite {
         this.bullet_slowCoefficient = 0.2;
 
         this.level = 1;
-        this.cost = 15;
+        this.cost = 6;
         this.damage = 2;
-        this.rateOfFire = 2500;
-        this.bulletSpeed = 2;
+        this.rateOfFire = 2000;
+        this.bulletSpeed = 2.4;
         this.radius = 100;
 
         this.level_incrementor = 1;

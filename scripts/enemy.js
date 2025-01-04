@@ -46,7 +46,6 @@ class Enemy extends PIXI.Graphics {
 
     this.on("pointerout", (event) => {
       this.destroyTowerSprites();
-      // this.towerToolTip.deactivate();
     });
   }
 
