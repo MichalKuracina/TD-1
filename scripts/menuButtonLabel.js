@@ -30,7 +30,7 @@ class MenuButtonLabel extends PIXI.Graphics {
           },
           label: this.label,
         });
-        labelText.x = 12;
+        labelText.x = 10;
         labelText.y = -10;
         this.addChild(labelText);
         break;
