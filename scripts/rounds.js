@@ -73,7 +73,7 @@ let rounds = [
     round: 8,
     spawnInterval: 7000,
     enemies: 3,
-    radius: 20,
+    radius: 18,
     color: 0xfc03f4,
     health: 300,
     speed: 0.4,
