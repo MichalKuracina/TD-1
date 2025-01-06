@@ -32,6 +32,7 @@ let hudContainer;
 let sprite;
 let towerSpritesheet;
 let roadSpritesheet;
+let levelUpTexture;
 
 let gold = 15;
 let lives = 30;
@@ -74,6 +75,8 @@ function run() {
 
     const heartTexture = await PIXI.Assets.load("assets/heart.png");
     const heart = PIXI.Sprite.from(heartTexture);
+
+    levelUpTexture = await PIXI.Assets.load("assets/levelup.png");
 
     await grass();
     paths = await path(structuredClone(route), []);
@@ -161,12 +164,20 @@ function updateTick(deltaTime) {
 
   // Move bullets.
   for (let i = 0; i < bullets.length; i++) {
-    bullets[i].move();
+    const etarget = enemies.filter((enm) => enm.uid === bullets[i].enemy_uid);
+    if (etarget.length === 0) {
+      // Target stopped existing (was killed)
+      // Move to last known position
+      bullets[i].move();
+    }
+    if (etarget.length === 1) {
+      // Move bullet towards enemy's current position
+      bullets[i].moveToEnemy(etarget[0].x, etarget[0].y);
+    }
 
     if (checkHitEnemy(bullets[i], enemies, deltaTime)) {
       bullets.splice(i, 1);
       i--;
-
       continue;
     }
 
@@ -187,6 +198,22 @@ function updateTick(deltaTime) {
       i--;
     }
   }
+
+  // Is ready to level up?
+  towers.forEach((tower) => {
+    if (tower.cost <= menu.gold) {
+      // This tower should have level up pin visible
+      if (!tower.levelUpPin) {
+        tower.addLevelUpPin();
+      }
+    } else {
+      if (tower.levelUpPin) {
+        tower.removeLevelUpPin();
+        // tower.levelUp = false;
+        // app.stage.removeChild(levelUpSprite);
+      }
+    }
+  });
 }
 
 function isInRange(number1, number2, limit) {
@@ -247,20 +274,23 @@ function checkHitEnemy(bullet, enemies, deltaTime) {
 
       if (enemies[i].health <= 0) {
         menu.addGold(enemies[i].prizeMoney);
+
+        if (enemies[i].enemyToolTip) {
+          enemies[i].destroyEnemyToolTip();
+        }
+
         app.stage.removeChild(enemies[i]);
         enemies[i].destroy();
         enemies.splice(i, 1);
-
-        // Rerender tower sprites to stay up to date with gold amount.
-        const activeToolTip = towers.filter((tower) => {
-          return tower.towerToolTip.toolTipActive === true;
-        });
-        if (activeToolTip.length === 1) {
-          activeToolTip[0].destroyTowerSprites();
-          activeToolTip[0].addTowerSprites();
-        }
       }
-
+      //   // Rerender tower sprites to stay up to date with gold amount.
+      //   const activeToolTip = towers.filter((tower) => {
+      //     return tower.towerToolTip.toolTipActive === true;
+      //   });
+      //   if (activeToolTip.length === 1) {
+      //     activeToolTip[0].destroyTowerSprites();
+      //     activeToolTip[0].addTowerSprites();
+      //   }
       hit = true;
     }
   }

@@ -33,6 +33,7 @@ class Tower extends PIXI.Sprite {
     this.next_rateOfFire = 0;
     this.next_bulletSpeed = 0;
     this.next_radius = 0;
+    this.levelUpPin = false;
 
     this.initTower();
   }
@@ -157,6 +158,10 @@ class Tower extends PIXI.Sprite {
         towers.splice(towerIndex, 1);
         this.destroyTowerSprites();
         menu.addGold(this.cost);
+
+        if (this.levelUpPin) {
+          this.removeLevelUpPin();
+        }
         break;
 
       default:
@@ -207,7 +212,8 @@ class Tower extends PIXI.Sprite {
     if (this.active) {
       //   // Add upgrade button.
 
-      if (this.cost + this.cost_incrementor <= menu.gold) {
+      if (this.cost <= menu.gold) {
+        // if (this.cost + this.cost_incrementor <= menu.gold) { // why was this including 'this.cost_incrementor'?
         this.addUpgradeButton();
       }
       // Add sell button.
@@ -347,7 +353,8 @@ class Tower extends PIXI.Sprite {
         this.damage,
         this.bullet_splashRadius,
         this.bullet_slowCoefficient,
-        this.effect
+        this.effect,
+        enemy.uid
       );
     }
   }
@@ -414,5 +421,21 @@ class Tower extends PIXI.Sprite {
       this.cursor = "pointer";
       this.tint = 16777215;
     }
+  }
+
+  addLevelUpPin() {
+    this.levelUpPin = PIXI.Sprite.from(levelUpTexture);
+    this.levelUpPin.anchor.set(0.5);
+    this.levelUpPin.width = 24;
+    this.levelUpPin.height = 24;
+    this.levelUpPin.tint = 0x00ff00;
+    this.levelUpPin.position.set(this.x - 24, this.y - 24);
+    app.stage.addChild(this.levelUpPin);
+  }
+
+  removeLevelUpPin() {
+    app.stage.removeChild(this.levelUpPin);
+    this.levelUpPin.destroy();
+    this.levelUpPin = null;
   }
 }

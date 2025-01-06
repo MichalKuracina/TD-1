@@ -41,15 +41,15 @@ class Enemy extends PIXI.Graphics {
     this.drawHealthBar();
 
     this.on("pointerover", (event) => {
-      this.addTowerSprites();
+      this.addEnemyToolTip();
     });
 
     this.on("pointerout", (event) => {
-      this.destroyTowerSprites();
+      this.destroyEnemyToolTip();
     });
   }
 
-  addTowerSprites() {
+  addEnemyToolTip() {
     this.cursor = "pointer";
 
     // Add tooltip.
@@ -68,10 +68,11 @@ class Enemy extends PIXI.Graphics {
     app.stage.addChild(this.enemyToolTip);
     this.enemyToolTip.activate();
   }
-  destroyTowerSprites() {
+  destroyEnemyToolTip() {
     // Destroy tooltip.
     app.stage.removeChild(this.enemyToolTip);
     this.enemyToolTip.destroy();
+    this.enemyToolTip = null;
   }
   move(deltaMS) {
     // this.clear();
