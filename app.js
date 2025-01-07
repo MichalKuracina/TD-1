@@ -12,6 +12,11 @@ const route = [
   { x: canvasWidth + 64, y: 448 },
 ];
 
+let scene = "play";
+
+let mutatedRounds = [];
+let roundsCounter = 1;
+
 let bullets = [];
 let towers = [];
 let paths = [];
@@ -28,6 +33,7 @@ let spawnElapsed = 0;
 let towerCount = 0;
 let enemyCount = 0;
 let hudContainer;
+let enemiesKilled = 0;
 
 let sprite;
 let towerSpritesheet;
@@ -90,7 +96,6 @@ function run() {
       towerSpritesheet,
       gold,
       lives,
-      rounds.length,
       playPauseSpritesheet
     );
     await menu.initMenu();
@@ -109,6 +114,7 @@ function run() {
     menu.playBtn.on("pointerdown", startGame);
     menu.pauseBtn.on("pointerdown", pauseGame);
 
+    mutatedRounds = mutate(rounds);
     app.ticker.add(updateTick);
   })();
 }
@@ -125,7 +131,29 @@ function pauseGame() {
   menu.pauseBtn.deactivate();
 }
 
+function gameOver(params) {
+  const gmvr = app.stage.children.filter(
+    (itm) => itm.label === "GameOverDetail"
+  );
+
+  if (gmvr.length === 0) {
+    // Add GameOver modal exactly once
+    const gmvrobj = new GameOver(roundsCounter, towers.length, enemiesKilled);
+    app.stage.addChild(gmvrobj);
+
+    app.stage.children.forEach((element) => {
+      // Disable all other elements
+      element.eventMode = "none";
+    });
+  }
+}
+
 function updateTick(deltaTime) {
+  if (scene === "gameOver") {
+    gameOver();
+    return;
+  }
+
   if (gamePaused) {
     return;
   }
@@ -214,6 +242,10 @@ function updateTick(deltaTime) {
       }
     }
   });
+
+  if (menu.lives <= 0) {
+    scene = "gameOver";
+  }
 }
 
 function isInRange(number1, number2, limit) {
@@ -274,6 +306,7 @@ function checkHitEnemy(bullet, enemies, deltaTime) {
 
       if (enemies[i].health <= 0) {
         menu.addGold(enemies[i].prizeMoney);
+        enemiesKilled++;
 
         if (enemies[i].enemyToolTip) {
           enemies[i].destroyEnemyToolTip();
@@ -439,9 +472,34 @@ function goodToBuild(dEl) {
   return result;
 }
 
+function mutate(arr) {
+  let result = [];
+
+  arr.forEach((round) => {
+    let new_enemies = Math.round(round.enemies * 1.3);
+    let new_health = Math.round(round.health * 1.5);
+    let new_speed = round.speed + 0.1;
+    let new_prizeMoney = Math.round(round.prizeMoney * 1.7);
+    // if (new_prizeMoney === round.prizeMoney) {
+    //   new_prizeMoney = round.prizeMoney++;
+    // }
+    result.push({
+      ...round,
+      enemies: new_enemies,
+      health: new_health,
+      speed: new_speed,
+      prizeMoney: new_prizeMoney,
+    });
+  });
+
+  return result;
+}
+
 function spawnEnemy(deltaMS) {
   if (rounds.length === 0) {
-    // End of spawning enemies..
+    rounds = structuredClone(mutatedRounds);
+    let temp = mutate(rounds);
+    mutatedRounds = structuredClone(temp);
     return;
   }
 
@@ -450,13 +508,14 @@ function spawnEnemy(deltaMS) {
   if (currentRound.enemies === 0) {
     spawnElapsed = -10000; // Pause in between rounds.
     rounds.shift();
+    roundsCounter++;
     return;
   }
 
   spawnElapsed += deltaMS;
 
   if (spawnElapsed >= currentRound.spawnInterval) {
-    menu.updateRoundCounter(currentRound.round);
+    menu.updateRoundCounter(roundsCounter);
     spawnElapsed = 0;
     const enemy = new Enemy(
       route[0].x,
@@ -466,7 +525,8 @@ function spawnEnemy(deltaMS) {
       currentRound.health,
       currentRound.health,
       currentRound.speed,
-      structuredClone(route)
+      structuredClone(route),
+      currentRound.prizeMoney
     );
     app.stage.addChild(enemy);
     enemies.push(enemy);

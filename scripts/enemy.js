@@ -60,7 +60,7 @@ class Enemy extends PIXI.Graphics {
       this.radius,
       this.color,
       `${this.health}/${this.healthMax}`,
-      this.speed,
+      Math.round(this.speed * 10) / 10,
       this.prizeMoney,
       this.radius,
       this.radius

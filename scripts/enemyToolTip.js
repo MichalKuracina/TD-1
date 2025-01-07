@@ -26,7 +26,7 @@ class EnemyToolTip extends PIXI.Graphics {
 
     // this.towerUid = "towerToolTip" + towerUid;
 
-    this.toolTipWidth = 85; // arbitrary num
+    this.toolTipWidth = 100; // arbitrary num
     this.toolTipHeight = 75; // arbitrary num
     this.toolTip_x = 0;
     this.toolTip_y = 0;

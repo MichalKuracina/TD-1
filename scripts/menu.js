@@ -5,14 +5,12 @@ class Menu extends PIXI.Container {
     towerSpritesheet,
     gold,
     lives,
-    roundsTotal,
     playPauseSpritesheet
   ) {
     super();
     this.menuHeight = menuHeight;
     this.gold = gold;
     this.lives = lives;
-    this.roundsTotal = roundsTotal;
     this.roundCounter = 1;
     this.heartSprite = heartSprite;
     this.towerSpritesheet = towerSpritesheet;
@@ -88,7 +86,7 @@ class Menu extends PIXI.Container {
       0,
       0,
       0,
-      `Rounds: ${this.roundCounter}/${this.roundsTotal}`
+      `Round: ${this.roundCounter}`
     );
     this.addChild(this.roundsLbl);
     // Heart button
@@ -187,7 +185,7 @@ class Menu extends PIXI.Container {
     this.roundCounter = roundNumber;
     this.roundsLbl.getChildByLabel(
       "rounds"
-    ).text = `Rounds: ${this.roundCounter}/${this.roundsTotal}`;
+    ).text = `Round: ${this.roundCounter}`;
   }
 
   addGold(amount) {
