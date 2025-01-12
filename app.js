@@ -1,18 +1,17 @@
-const canvasWidth = 700;
-const canvasHeight = 500;
+const canvasWidth = 704;
+const canvasHeight = 512;
+const menuHeight = 128;
 
-const route = [
-  { x: -64, y: 128 },
-  { x: 576, y: 128 },
-  { x: 576, y: 320 },
-  { x: 256, y: 320 },
-  { x: 256, y: 192 },
-  { x: 128, y: 192 },
-  { x: 128, y: 448 },
-  { x: canvasWidth + 64, y: 448 },
+let route = [
+  { x: 320, y: 128 },
+  { x: 320, y: 384 },
+  { x: 448, y: 384 },
+  { x: 448, y: canvasHeight },
 ];
 
-let scene = "play";
+let new_route = [];
+
+let scene = "play"; // worldEditor // gameOver //play
 
 let mutatedRounds = [];
 let roundsCounter = 1;
@@ -22,6 +21,8 @@ let towers = [];
 let paths = [];
 let enemies = [];
 let explosions = [];
+let newWorldLines = [];
+let newTiles = [];
 
 let app;
 let menu;
@@ -82,16 +83,28 @@ function run() {
     const heartTexture = await PIXI.Assets.load("assets/heart.png");
     const heart = PIXI.Sprite.from(heartTexture);
 
+    const worldEditorTexture = await PIXI.Assets.load("assets/levelEditor.png");
+    const worldEditorSprite = PIXI.Sprite.from(worldEditorTexture);
+
     levelUpTexture = await PIXI.Assets.load("assets/levelup.png");
 
     await grass();
-    paths = await path(structuredClone(route), []);
+    // paths = await path(structuredClone(route), []);
 
-    const menuHeight = 80;
-    //grid(menuHeight);
+    paths = await drawRoad(
+      structuredClone(route),
+      [],
+      0,
+      canvasWidth,
+      menuHeight,
+      canvasHeight
+    );
+
+    grid(menuHeight);
 
     menu = new Menu(
       menuHeight,
+      worldEditorSprite,
       heart,
       towerSpritesheet,
       gold,
@@ -113,6 +126,7 @@ function run() {
 
     menu.playBtn.on("pointerdown", startGame);
     menu.pauseBtn.on("pointerdown", pauseGame);
+    menu.worldEditorBtn.on("pointerdown", createWorld);
 
     mutatedRounds = mutate(rounds);
     app.ticker.add(updateTick);
@@ -131,7 +145,7 @@ function pauseGame() {
   menu.pauseBtn.deactivate();
 }
 
-function gameOver(params) {
+function gameOver() {
   const gmvr = app.stage.children.filter(
     (itm) => itm.label === "GameOverDetail"
   );
@@ -151,6 +165,10 @@ function gameOver(params) {
 function updateTick(deltaTime) {
   if (scene === "gameOver") {
     gameOver();
+    return;
+  }
+
+  if (scene === "worldEditor") {
     return;
   }
 
@@ -233,6 +251,7 @@ function updateTick(deltaTime) {
       // This tower should have level up pin visible
       if (!tower.levelUpPin) {
         tower.addLevelUpPin();
+        // lvlUpPins.push(tower.levelUpPin);
       }
     } else {
       if (tower.levelUpPin) {

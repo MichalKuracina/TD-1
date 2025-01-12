@@ -1,3 +1,37 @@
+async function drawRoad(
+  routeObj,
+  pathTiles,
+  canvas_left,
+  canvas_right,
+  canvas_top,
+  canvas_bottom
+) {
+  //   routeObj[0].x = routeObj[0].x - 64;
+  //   console.log(routeObj);
+
+  if (routeObj[0].x === canvas_left) {
+    // First tile is on left
+    routeObj[0].x = routeObj[0].x - 64;
+  }
+
+  if (routeObj[0].x === canvas_right) {
+    // First tile is on right
+    routeObj[0].x = routeObj[0].x + 64;
+  }
+
+  if (routeObj[0].y === canvas_top) {
+    // First tile is on top
+    routeObj[0].y = routeObj[0].y - 64;
+  }
+
+  if (routeObj[0].y === canvas_bottom) {
+    // First tile is on bottom
+    routeObj[0].y = routeObj[0].y + 64;
+  }
+
+  return await path(routeObj, pathTiles);
+}
+
 async function path(routeObj, pathTiles) {
   const spriteWidth = 64;
   let new_x;

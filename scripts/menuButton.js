@@ -28,6 +28,10 @@ class MenuButton extends PIXI.Sprite {
         this.width = 48;
         this.height = 48;
         break;
+      case "wrldEditor":
+        this.width = 48;
+        this.height = 48;
+        break;
       default:
         break;
     }
