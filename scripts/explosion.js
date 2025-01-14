@@ -8,6 +8,7 @@ class Explosion extends PIXI.Graphics {
     this.color = color;
     this.exlosionFinished = false;
     this.transparency = 1;
+    this.zIndex = 999;
   }
 
   explode() {

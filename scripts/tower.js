@@ -34,6 +34,7 @@ class Tower extends PIXI.Sprite {
     this.next_bulletSpeed = 0;
     this.next_radius = 0;
     this.levelUpPin = false;
+    this.zIndex = 1;
 
     this.initTower();
   }
@@ -430,6 +431,7 @@ class Tower extends PIXI.Sprite {
     this.levelUpPin.height = 24;
     this.levelUpPin.tint = 0x00ff00;
     this.levelUpPin.position.set(this.x - 24, this.y - 24);
+    this.levelUpPin.zIndex = 999;
     app.stage.addChild(this.levelUpPin);
   }
 

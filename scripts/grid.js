@@ -1,5 +1,6 @@
 function grid(menuHeight) {
   const line = new PIXI.Graphics();
+  line.label = "gridLine";
   app.stage.addChild(line);
 
   const horizontalLines = Math.floor(canvasHeight / 64) + 1;
@@ -20,7 +21,7 @@ function grid(menuHeight) {
 
     text.x = 0;
     text.y = h * 64;
-
+    text.label = "gridLine";
     app.stage.addChild(text);
   }
 
@@ -39,7 +40,7 @@ function grid(menuHeight) {
 
     text.x = v * 64;
     text.y = menuHeight + 10;
-
+    text.label = "gridLine";
     app.stage.addChild(text);
   }
 

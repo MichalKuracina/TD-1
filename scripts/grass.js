@@ -7,6 +7,7 @@ async function grass() {
       const x = i * 64;
       const y = j * 64;
       const grass = new PIXI.Sprite(roadSpritesheet.textures.grass);
+      grass.label = "grass";
       app.stage.addChild(grass);
       grass.position.set(x, y);
     }

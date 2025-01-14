@@ -31,6 +31,7 @@ class Enemy extends PIXI.Graphics {
     this.minimalSpeed = 0.2;
     this.freezeElapsed = 0;
     this.freezeRecover = 5000;
+    this.zIndex = 999;
 
     this.initEnemy();
   }

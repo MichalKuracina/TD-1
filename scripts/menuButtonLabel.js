@@ -8,6 +8,7 @@ class MenuButtonLabel extends PIXI.Graphics {
     this.price = price;
     this.lives = lives;
     this.rounds = rounds;
+    this.zIndex = 1;
 
     this.initMenuButtonLabel();
   }

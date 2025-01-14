@@ -7,6 +7,7 @@ class TowerButton extends PIXI.Graphics {
     this.text = text;
     this.label = label;
     this.towerButtonContainer = null;
+    this.zIndex = 1;
 
     this.initTowerButton();
   }

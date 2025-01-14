@@ -2,6 +2,8 @@ class Menu extends PIXI.Container {
   constructor(
     menuHeight,
     worldEditorSprite,
+    loadSprite,
+    saveSprite,
     heartSprite,
     towerSpritesheet,
     gold,
@@ -14,6 +16,8 @@ class Menu extends PIXI.Container {
     this.lives = lives;
     this.roundCounter = 1;
     this.worldEditorSprite = worldEditorSprite;
+    this.loadSprite = loadSprite;
+    this.saveSprite = saveSprite;
     this.heartSprite = heartSprite;
     this.towerSpritesheet = towerSpritesheet;
     this.playPauseSpritesheet = playPauseSpritesheet;
@@ -103,6 +107,16 @@ class Menu extends PIXI.Container {
     this.worldEditorBtn.eventMode = "static";
     this.worldEditorBtn.cursor = "pointer";
     this.addChild(this.worldEditorBtn);
+
+    // Save button
+    this.saveBtn = new MenuButton(this.saveSprite, "saveBtn", 128, 96);
+    this.saveBtn.deactivate();
+    this.addChild(this.saveBtn);
+
+    // Load button
+    this.loadBtn = new MenuButton(this.loadSprite, "loadBtn", 192, 96);
+    this.loadBtn.deactivate();
+    this.addChild(this.loadBtn);
 
     // Heart button
     this.heartBtn = new MenuButton(
@@ -232,6 +246,10 @@ class Menu extends PIXI.Container {
     }
 
     this.heartLbl.getChildByLabel("heart").text = this.lives;
+  }
+
+  updateLives(livesNumber) {
+    this.heartLbl.getChildByLabel("heart").text = livesNumber;
   }
 
   async getSprites() {

@@ -68,7 +68,6 @@ class GameOver extends PIXI.Graphics {
 
     gameOverlbl.x = this.text_x;
     gameOverlbl.y = this.text_y - 65;
-
     gameOverlbl.anchor.set(0.5);
     this.addChild(gameOverlbl);
 

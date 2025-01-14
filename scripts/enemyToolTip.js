@@ -23,6 +23,7 @@ class EnemyToolTip extends PIXI.Graphics {
     this.gold = gold;
     this.enemyWidth = enemyWidth;
     this.enemyHeight = enemyHeight;
+    this.zIndex = 999;
 
     // this.towerUid = "towerToolTip" + towerUid;
 

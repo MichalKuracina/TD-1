@@ -135,6 +135,7 @@ async function path(routeObj, pathTiles) {
   road.position.set(new_x, new_y);
   road.anchor.set(0.5);
   road.label = "roadTile";
+  road.zIndex = 1;
   app.stage.addChild(road);
   pathTiles.push(road);
 
@@ -199,6 +200,8 @@ async function path(routeObj, pathTiles) {
 
     curve.position.set(new_x, new_y);
     curve.anchor.set(0.5);
+    curve.label = "curveTile";
+    curve.zIndex = 1;
     app.stage.addChild(curve);
     pathTiles.push(curve);
   }

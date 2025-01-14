@@ -2,11 +2,22 @@ const canvasWidth = 704;
 const canvasHeight = 512;
 const menuHeight = 128;
 
+// let route = [
+//   { x: 320, y: 128 },
+//   { x: 320, y: 384 },
+//   { x: 448, y: 384 },
+//   { x: 448, y: canvasHeight },
+// ];
+
 let route = [
-  { x: 320, y: 128 },
-  { x: 320, y: 384 },
-  { x: 448, y: 384 },
-  { x: 448, y: canvasHeight },
+  { x: 0, y: 192 },
+  { x: 576, y: 192 },
+  { x: 576, y: 320 },
+  { x: 320, y: 320 },
+  { x: 320, y: 256 },
+  { x: 128, y: 256 },
+  { x: 128, y: 448 },
+  { x: 704, y: 448 },
 ];
 
 let new_route = [];
@@ -14,6 +25,7 @@ let new_route = [];
 let scene = "play"; // worldEditor // gameOver //play
 
 let mutatedRounds = [];
+let originalRounds = [];
 let roundsCounter = 1;
 
 let bullets = [];
@@ -83,13 +95,18 @@ function run() {
     const heartTexture = await PIXI.Assets.load("assets/heart.png");
     const heart = PIXI.Sprite.from(heartTexture);
 
+    const loadTexture = await PIXI.Assets.load("assets/load.png");
+    const load = PIXI.Sprite.from(loadTexture);
+
+    const saveTexture = await PIXI.Assets.load("assets/save.png");
+    const save = PIXI.Sprite.from(saveTexture);
+
     const worldEditorTexture = await PIXI.Assets.load("assets/levelEditor.png");
     const worldEditorSprite = PIXI.Sprite.from(worldEditorTexture);
 
     levelUpTexture = await PIXI.Assets.load("assets/levelup.png");
 
     await grass();
-    // paths = await path(structuredClone(route), []);
 
     paths = await drawRoad(
       structuredClone(route),
@@ -100,11 +117,13 @@ function run() {
       canvasHeight
     );
 
-    grid(menuHeight);
+    // grid(menuHeight);
 
     menu = new Menu(
       menuHeight,
       worldEditorSprite,
+      load,
+      save,
       heart,
       towerSpritesheet,
       gold,
@@ -112,6 +131,7 @@ function run() {
       playPauseSpritesheet
     );
     await menu.initMenu();
+    menu.zIndex = 998;
     app.stage.addChild(menu);
 
     menu.standardBtn.on("pointerdown", onDragStart, menu.standardBtn);
@@ -127,10 +147,66 @@ function run() {
     menu.playBtn.on("pointerdown", startGame);
     menu.pauseBtn.on("pointerdown", pauseGame);
     menu.worldEditorBtn.on("pointerdown", createWorld);
+    menu.saveBtn.on("pointerdown", saveWorld);
+    menu.loadBtn.on("pointerdown", loadWorld);
+
+    loadButtonStatus();
 
     mutatedRounds = mutate(rounds);
+    originalRounds = structuredClone(rounds); // this is used when load new world
     app.ticker.add(updateTick);
   })();
+}
+
+function loadButtonStatus() {
+  const worldToLoad = localStorage.getItem("td-world");
+  if (worldToLoad) {
+    menu.loadBtn.activate();
+  }
+}
+
+function saveWorld() {
+  // Save current route to local storage
+  localStorage.setItem("td-world", JSON.stringify(route));
+  menu.saveBtn.deactivate();
+  loadButtonStatus();
+}
+
+async function loadWorld() {
+  menu.saveBtn.deactivate();
+  // Load route from local storage
+  const worldToLoad = localStorage.getItem("td-world");
+
+  cleanWorld();
+  route = JSON.parse(worldToLoad);
+  paths = await drawRoad(
+    structuredClone(route),
+    [],
+    0,
+    canvasWidth,
+    menuHeight,
+    canvasHeight
+  );
+
+  restartWorld();
+}
+
+function restartWorld() {
+  roundsCounter = 1;
+  rounds = originalRounds;
+  mutatedRounds = mutate(rounds);
+  towerCount = 0;
+  enemyCount = 0;
+  enemiesKilled = 0;
+
+  menu.gold = 15;
+  menu.lives = 30;
+  menu.updateRoundCounter(1);
+  menu.updateLives(30);
+  menu.standardBtn.refreshButtonSprite(gold);
+  menu.splashBtn.refreshButtonSprite(gold);
+  menu.slowBtn.refreshButtonSprite(gold);
+  menu.coinLbl.getChildByLabel("coin").text = `${gold}€`;
 }
 
 function startGame() {
@@ -153,6 +229,7 @@ function gameOver() {
   if (gmvr.length === 0) {
     // Add GameOver modal exactly once
     const gmvrobj = new GameOver(roundsCounter, towers.length, enemiesKilled);
+    gmvrobj.zIndex = 999;
     app.stage.addChild(gmvrobj);
 
     app.stage.children.forEach((element) => {
@@ -372,6 +449,7 @@ async function onDragStart(event) {
   dragTarget.anchor.set(0.5);
   dragTarget.alpha = 0.5;
   dragTarget.label = this.label;
+  dragTarget.zIndex = 999;
   dragTarget.position.set(event.data.global.x, event.data.global.y);
 
   app.stage.addChild(dragTarget);
@@ -547,6 +625,7 @@ function spawnEnemy(deltaMS) {
       structuredClone(route),
       currentRound.prizeMoney
     );
+    enemy.zIndex = 1;
     app.stage.addChild(enemy);
     enemies.push(enemy);
     currentRound.enemies--;

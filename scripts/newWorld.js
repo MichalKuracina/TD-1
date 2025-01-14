@@ -1,7 +1,7 @@
 function createWorld() {
   scene = "worldEditor";
   cleanWorld();
-
+  grid(menuHeight);
   getStartingPositions();
 }
 
@@ -41,20 +41,28 @@ async function getNextPositions(fromStartingX, fromStartingY) {
 
   let direction;
   if (!firstMove) {
-    // const lastPreviousX = new_route.at(-1).x;
-    // const lastPreviousY = new_route.at(-1).y;
-    // const currentX = previousX;
-    // const currentY = previousY;
     direction = determineDirection(
       new_route.at(-1).x,
       new_route.at(-1).y,
       previousX,
       previousY
     );
-    // console.log(direction);
   }
 
   new_route.push({ x: previousX, y: previousY });
+
+  destroyElements(paths);
+
+  if (new_route.length > 1) {
+    paths = await drawRoad(
+      structuredClone(new_route),
+      [],
+      0,
+      canvasWidth,
+      menuHeight,
+      canvasHeight
+    );
+  }
 
   if (!firstMove) {
     const nwl = new NewWorldLine(
@@ -63,9 +71,9 @@ async function getNextPositions(fromStartingX, fromStartingY) {
       new_route.at(-2).x,
       new_route.at(-2).y
     );
+    nwl.zIndex = 0;
     app.stage.addChild(nwl);
     newWorldLines.push(nwl);
-    // console.log(nwl);
   }
 
   const strtTls = app.stage.children.filter(
@@ -89,6 +97,11 @@ async function getNextPositions(fromStartingX, fromStartingY) {
         menuHeight,
         canvasHeight
       );
+      menu.saveBtn.activate();
+
+      const grdLns = app.stage.children.filter((el) => el.label === "gridLine");
+      destroyElements(grdLns);
+      restartWorld();
       return;
     }
   }
@@ -337,6 +350,8 @@ function startingTileSet() {
   getNextPositions(startingTile_x, startingTile_y);
 }
 function cleanWorld() {
+  new_route.length = 0;
+
   if (towers.length > 0) {
     towers.forEach((twr) => {
       if (twr.levelUpPin) {
@@ -346,28 +361,19 @@ function cleanWorld() {
     destroyElements(towers);
   }
 
-  if (paths.length > 0) {
-    destroyElements(paths);
-  }
-
-  if (enemies.length > 0) {
-    destroyElements(enemies);
-  }
-  if (bullets.length > 0) {
-    destroyElements(bullets);
-  }
-  if (explosions.length > 0) {
-    destroyElements(explosions);
-  }
-  if (route.length > 0) {
-    route.length = 0;
-  }
-  if (newWorldLines.length > 0) {
-    destroyElements(newWorldLines);
-  }
-  if (newTiles.length > 0) {
-    destroyElements(newTiles);
-  }
+  destroyElements(paths);
+  destroyElements(enemies);
+  destroyElements(bullets);
+  destroyElements(explosions);
+  route.length = 0;
+  destroyElements(newWorldLines);
+  destroyElements(newTiles);
+  const rrs = app.stage.children.filter(
+    (el) => el.label === "roadTile" || el.label === "curveTile"
+  );
+  destroyElements(rrs);
+  const grdLns = app.stage.children.filter((el) => el.label === "gridLine");
+  destroyElements(grdLns);
 }
 function destroyElements(arr) {
   for (let i = arr.length - 1; i >= 0; i--) {

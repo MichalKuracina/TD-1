@@ -5,6 +5,7 @@ class TowerCircle extends PIXI.Graphics {
     this.tower_y = y;
     this.radius = radius;
     this.color = color;
+    this.zIndex = 999;
 
     this.initTowerCircle();
   }

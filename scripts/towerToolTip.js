@@ -51,6 +51,8 @@ class TowerToolTip extends PIXI.Graphics {
     this.next_rateOfFire = next_rateOfFire;
     this.next_bulletSpeed = next_bulletSpeed;
     this.next_radius = next_radius;
+
+    this.zIndex = 999;
     // this.towerIsActive = false;
 
     this.initTowerDetail();

@@ -5,6 +5,7 @@ class MenuButton extends PIXI.Sprite {
     this.x = x;
     this.y = y;
     this.cursor = "pointer";
+    this.zIndex = 1;
 
     this.initMenuButton();
   }
@@ -32,6 +33,14 @@ class MenuButton extends PIXI.Sprite {
         this.width = 48;
         this.height = 48;
         break;
+      case "loadBtn":
+        this.width = 64;
+        this.height = 32;
+        break;
+      case "saveBtn":
+        this.width = 64;
+        this.height = 32;
+        break;
       default:
         break;
     }
@@ -41,10 +50,12 @@ class MenuButton extends PIXI.Sprite {
     this.eventMode = "static";
     this.cursor = "pointer";
     this.tint = "0x40eb34";
+    this.status = "enabled";
   }
 
   deactivate() {
     this.eventMode = "none";
     this.tint = "0x808080";
+    this.status = "disabled";
   }
 }
