@@ -14,7 +14,6 @@ class MenuButton extends PIXI.Sprite {
     this.position.set(this.x, this.y);
     this.anchor.set(0.5);
 
-    // this.filters = new PIXI.BlurFilter({ strength: 8 });
     switch (this.label) {
       case "heart":
         this.width = 15;

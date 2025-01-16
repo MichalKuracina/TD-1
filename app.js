@@ -2,13 +2,6 @@ const canvasWidth = 704;
 const canvasHeight = 512;
 const menuHeight = 128;
 
-// let route = [
-//   { x: 320, y: 128 },
-//   { x: 320, y: 384 },
-//   { x: 448, y: 384 },
-//   { x: 448, y: canvasHeight },
-// ];
-
 let route = [
   { x: 0, y: 192 },
   { x: 576, y: 192 },
@@ -412,14 +405,6 @@ function checkHitEnemy(bullet, enemies, deltaTime) {
         enemies[i].destroy();
         enemies.splice(i, 1);
       }
-      //   // Rerender tower sprites to stay up to date with gold amount.
-      //   const activeToolTip = towers.filter((tower) => {
-      //     return tower.towerToolTip.toolTipActive === true;
-      //   });
-      //   if (activeToolTip.length === 1) {
-      //     activeToolTip[0].destroyTowerSprites();
-      //     activeToolTip[0].addTowerSprites();
-      //   }
       hit = true;
     }
   }
@@ -451,6 +436,8 @@ async function onDragStart(event) {
   dragTarget.label = this.label;
   dragTarget.zIndex = 999;
   dragTarget.position.set(event.data.global.x, event.data.global.y);
+  dragTarget.width = 40;
+  dragTarget.height = 40;
 
   app.stage.addChild(dragTarget);
 

@@ -21,26 +21,18 @@ class Menu extends PIXI.Container {
     this.heartSprite = heartSprite;
     this.towerSpritesheet = towerSpritesheet;
     this.playPauseSpritesheet = playPauseSpritesheet;
-    this.menuIcon1_radius = 300;
-    this.menuIcon2_radius = 200;
-    this.menuIcon3_radius = 100;
-    this.menuIcon1_color = 0x56a843;
-    this.menuIcon2_color = 0x996863;
-    this.menuIcon3_color = 0x85b4f2;
     this.menuIcon1_price = 5;
     this.menuIcon2_price = 7;
     this.menuIcon3_price = 6;
-    this.roundsLbl_x = 180;
-    this.wrldEditor_x = 64;
-    this.heartIcon_x = 200;
-    this.menuIcon1_x = 320;
-    this.menuIcon2_x = 384;
-    this.menuIcon3_x = 448;
+    this.roundsLbl_x = 240;
+    this.wrldEditor_x = 45;
+    this.heartIcon_x = 250;
+    this.menuIcon1_x = 390;
+    this.menuIcon2_x = 440;
+    this.menuIcon3_x = 490;
     this.menuIcon4_x = 576;
-    this.menuIcon_y = 32;
+    this.menuIcon_y = 64;
     this.paused = true;
-    // this.playBtn = null;
-    // this.pauseBtn = null;
   }
 
   async initMenu() {
@@ -78,11 +70,11 @@ class Menu extends PIXI.Container {
     pauseTexture
   ) {
     // Play button
-    this.playBtn = new MenuButton(playTexture, "play", 32, 32);
+    this.playBtn = new MenuButton(playTexture, "play", 45, 32);
     this.playBtn.deactivate();
     this.addChild(this.playBtn);
     // Pause button
-    this.pauseBtn = new MenuButton(pauseTexture, "pause", 96, 32);
+    this.pauseBtn = new MenuButton(pauseTexture, "pause", 105, 32);
     this.pauseBtn.activate();
     this.addChild(this.pauseBtn);
     // Rounds
@@ -102,19 +94,19 @@ class Menu extends PIXI.Container {
       this.worldEditorSprite,
       "wrldEditor",
       this.wrldEditor_x,
-      this.menuIcon_y + 48
+      this.menuIcon_y + 24
     );
     this.worldEditorBtn.eventMode = "static";
     this.worldEditorBtn.cursor = "pointer";
     this.addChild(this.worldEditorBtn);
 
     // Save button
-    this.saveBtn = new MenuButton(this.saveSprite, "saveBtn", 128, 96);
+    this.saveBtn = new MenuButton(this.saveSprite, "saveBtn", 115, 85);
     this.saveBtn.deactivate();
     this.addChild(this.saveBtn);
 
     // Load button
-    this.loadBtn = new MenuButton(this.loadSprite, "loadBtn", 192, 96);
+    this.loadBtn = new MenuButton(this.loadSprite, "loadBtn", 185, 85);
     this.loadBtn.deactivate();
     this.addChild(this.loadBtn);
 
@@ -122,8 +114,8 @@ class Menu extends PIXI.Container {
     this.heartBtn = new MenuButton(
       this.heartSprite,
       "heart",
-      this.heartIcon_x,
-      this.menuIcon_y / 1.5
+      this.heartIcon_x + 3,
+      this.menuIcon_y - 8
     );
     this.addChild(this.heartBtn);
 

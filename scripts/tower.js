@@ -118,6 +118,8 @@ class Tower extends PIXI.Sprite {
     this.label = this.type;
     this.name = this.type;
     this.eventMode = "static";
+    this.width = 40;
+    this.height = 40;
 
     this.addTowerSprites();
     this.destroyTowerSprites();

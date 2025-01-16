@@ -33,7 +33,7 @@ class Bullet extends PIXI.Graphics {
     this.enemy_uid = enemy_uid;
 
     this.distance = 0;
-    this.zIndex = 999;
+    this.zIndex = 997;
 
     this.drawBullet();
   }

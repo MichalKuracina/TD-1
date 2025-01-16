@@ -4,12 +4,56 @@ body {
     linear-gradient(to top right, blue, transparent);
   background-blend-mode: screen;
   display: flex;
-  flex-direction: column;
+  flex-direction: column-reverse;
   justify-content: center;
   align-items: center;
+  min-height: 100vh;
+  margin: 0;
 }
 
 canvas {
   box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px,
     rgba(0, 0, 0, 0.22) 0px 15px 12px;
+  width: 50vw;
+}
+
+.githublogo > img {
+  margin-top: 5vh;
+  width: 42px;
+  height: 42px;
+}
+
+/* Extra small devices (phones, 600px and down) */
+@media only screen and (max-width: 600px) {
+  canvas {
+    width: 90vw;
+  }
+}
+
+/* Small devices (portrait tablets and large phones, 600px and up) */
+@media only screen and (min-width: 600px) {
+  canvas {
+    width: 90vw;
+  }
+}
+
+/* Medium devices (landscape tablets, 768px and up) */
+@media only screen and (min-width: 768px) {
+  canvas {
+    width: 80vw;
+  }
+}
+
+/* Large devices (laptops/desktops, 992px and up) */
+@media only screen and (min-width: 992px) {
+  canvas {
+    width: 70vw;
+  }
+}
+
+/* Extra large devices (large laptops and desktops, 1200px and up) */
+@media only screen and (min-width: 1200px) {
+  canvas {
+    width: 50vw;
+  }
 }
