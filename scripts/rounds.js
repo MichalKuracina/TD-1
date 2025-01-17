@@ -82,7 +82,7 @@ let rounds = [
   {
     round: 9,
     spawnInterval: 500,
-    enemies: 50,
+    enemies: 20,
     radius: 9,
     color: 0x068dd1,
     health: 50,
@@ -92,10 +92,10 @@ let rounds = [
   {
     round: 10,
     spawnInterval: 900,
-    enemies: 100,
+    enemies: 40,
     radius: 10,
     color: 0x19bf74,
-    health: 100,
+    health: 70,
     speed: 0.8,
     prizeMoney: 1,
   },

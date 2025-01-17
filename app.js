@@ -28,6 +28,7 @@ let enemies = [];
 let explosions = [];
 let newWorldLines = [];
 let newTiles = [];
+let plusHearts = [];
 
 let app;
 let menu;
@@ -45,6 +46,7 @@ let sprite;
 let towerSpritesheet;
 let roadSpritesheet;
 let levelUpTexture;
+let heartSpr_big;
 
 let gold = 15;
 let lives = 30;
@@ -52,6 +54,7 @@ let dragTarget = null;
 let twrCircle = null;
 let dragTarget_x = 0;
 let dragTarget_y = 0;
+let firstEnemy = false;
 
 function run() {
   (async () => {
@@ -86,7 +89,10 @@ function run() {
     await playPauseSpritesheet.parse();
 
     const heartTexture = await PIXI.Assets.load("assets/heart.png");
-    const heart = PIXI.Sprite.from(heartTexture);
+    const heartSpr_small = PIXI.Sprite.from(heartTexture);
+
+    const heartTexture2 = await PIXI.Assets.load("assets/heart.png");
+    heartSpr_big = PIXI.Sprite.from(heartTexture2);
 
     const loadTexture = await PIXI.Assets.load("assets/load.png");
     const load = PIXI.Sprite.from(loadTexture);
@@ -117,7 +123,7 @@ function run() {
       worldEditorSprite,
       load,
       save,
-      heart,
+      heartSpr_small,
       towerSpritesheet,
       gold,
       lives,
@@ -142,6 +148,7 @@ function run() {
     menu.worldEditorBtn.on("pointerdown", createWorld);
     menu.saveBtn.on("pointerdown", saveWorld);
     menu.loadBtn.on("pointerdown", loadWorld);
+    // app.stage.on("pointerdown", addHeart);
 
     loadButtonStatus();
 
@@ -149,6 +156,21 @@ function run() {
     originalRounds = structuredClone(rounds); // this is used when load new world
     app.ticker.add(updateTick);
   })();
+}
+
+async function addHeart(amount) {
+  const heartObj = new PlusHeart(
+    heartSpr_big,
+    "heartContainer",
+    canvasWidth / 2,
+    canvasHeight / 2,
+    menu.heartBtn.x,
+    menu.heartBtn.y,
+    amount
+  );
+  app.stage.addChild(heartObj);
+  plusHearts.push(heartObj);
+  menu.addLives(amount);
 }
 
 function loadButtonStatus() {
@@ -315,22 +337,30 @@ function updateTick(deltaTime) {
     }
   }
 
-  // Is ready to level up?
+  // Level Up Pin
   towers.forEach((tower) => {
     if (tower.cost <= menu.gold) {
       // This tower should have level up pin visible
       if (!tower.levelUpPin) {
         tower.addLevelUpPin();
-        // lvlUpPins.push(tower.levelUpPin);
       }
     } else {
       if (tower.levelUpPin) {
         tower.removeLevelUpPin();
-        // tower.levelUp = false;
-        // app.stage.removeChild(levelUpSprite);
       }
     }
   });
+
+  // Draw Big Heart
+  for (let i = 0; i < plusHearts.length; i++) {
+    plusHearts[i].fadeout(deltaTime.deltaMS);
+    if (plusHearts[i].width <= 10) {
+      app.stage.removeChild(plusHearts[i]);
+      plusHearts[i].destroy();
+      plusHearts.splice(i, 1);
+      i--;
+    }
+  }
 
   if (menu.lives <= 0) {
     scene = "gameOver";
@@ -581,6 +611,7 @@ function mutate(arr) {
 
 function spawnEnemy(deltaMS) {
   if (rounds.length === 0) {
+    // All 10 rounds are over
     rounds = structuredClone(mutatedRounds);
     let temp = mutate(rounds);
     mutatedRounds = structuredClone(temp);
@@ -593,13 +624,13 @@ function spawnEnemy(deltaMS) {
     spawnElapsed = -10000; // Pause in between rounds.
     rounds.shift();
     roundsCounter++;
+    firstEnemy = true;
     return;
   }
 
   spawnElapsed += deltaMS;
 
   if (spawnElapsed >= currentRound.spawnInterval) {
-    menu.updateRoundCounter(roundsCounter);
     spawnElapsed = 0;
     const enemy = new Enemy(
       route[0].x,
@@ -616,5 +647,12 @@ function spawnEnemy(deltaMS) {
     app.stage.addChild(enemy);
     enemies.push(enemy);
     currentRound.enemies--;
+
+    if (firstEnemy) {
+      // First enemy of this round
+      addHeart(roundsCounter);
+      menu.updateRoundCounter(roundsCounter);
+      firstEnemy = false;
+    }
   }
 }

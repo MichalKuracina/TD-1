@@ -127,8 +127,8 @@ class Menu extends PIXI.Container {
       0,
       this.lives
     );
-
     this.addChild(this.heartLbl);
+
     // Standard button
     this.standardBtn = new Tower(
       towerStandardTexture,
@@ -200,6 +200,8 @@ class Menu extends PIXI.Container {
     );
 
     this.addChild(this.coinLbl);
+
+    // console.log(this.heartBtn);
   }
 
   updateRoundCounter(roundNumber) {
@@ -238,6 +240,12 @@ class Menu extends PIXI.Container {
     }
 
     this.heartLbl.getChildByLabel("heart").text = this.lives;
+  }
+
+  addLives(amount) {
+    this.lives = this.lives + amount;
+    this.heartLbl.getChildByLabel("heart").text = this.lives;
+    // console.log(this.heartBtn);
   }
 
   updateLives(livesNumber) {
