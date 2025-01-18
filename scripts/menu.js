@@ -135,7 +135,8 @@ class Menu extends PIXI.Container {
       this.menuIcon1_x,
       this.menuIcon_y,
       "standard",
-      false
+      false,
+      null
     );
     this.addChild(this.standardBtn);
     this.standardLbl = new MenuButtonLabel(
@@ -153,7 +154,8 @@ class Menu extends PIXI.Container {
       this.menuIcon2_x,
       this.menuIcon_y,
       "splash",
-      false
+      false,
+      null
     );
     this.addChild(this.splashBtn);
     this.splashLbl = new MenuButtonLabel(
@@ -171,7 +173,8 @@ class Menu extends PIXI.Container {
       this.menuIcon3_x,
       this.menuIcon_y,
       "slow",
-      false
+      false,
+      null
     );
     this.addChild(this.slowBtn);
     this.slowLbl = new MenuButtonLabel(

@@ -1,10 +1,20 @@
 class Tower extends PIXI.Sprite {
-  constructor(texture, x = 0, y = 0, type = "standard", active = false) {
+  constructor(
+    texture,
+    x = 0,
+    y = 0,
+    type = "standard",
+    active = false,
+    crownTexture = null
+  ) {
     super(texture);
     this.x = x;
     this.y = y;
     this.type = type;
     this.active = active;
+    this.crownTexture = crownTexture;
+    this.maxLevel = 10;
+    this.crownSprite = null;
     this.level = 1;
     this.damage = 1;
     this.rateOfFire = 1000;
@@ -152,6 +162,9 @@ class Tower extends PIXI.Sprite {
         this.upgrade();
         this.destroyTowerSprites();
         this.addTowerSprites();
+        if (this.level === this.maxLevel) {
+          this.addCrown();
+        }
         break;
       case "sell":
         app.stage.removeChild(this);
@@ -164,6 +177,10 @@ class Tower extends PIXI.Sprite {
 
         if (this.levelUpPin) {
           this.removeLevelUpPin();
+        }
+
+        if (this.crownSprite) {
+          this.removeCrown();
         }
         break;
 
@@ -213,12 +230,12 @@ class Tower extends PIXI.Sprite {
     this.towerToolTip.activate();
 
     if (this.active) {
-      //   // Add upgrade button.
-
-      if (this.cost <= menu.gold) {
+      // Add upgrade button.
+      if (this.cost <= menu.gold && this.level < this.maxLevel) {
         // if (this.cost + this.cost_incrementor <= menu.gold) { // why was this including 'this.cost_incrementor'?
         this.addUpgradeButton();
       }
+
       // Add sell button.
       this.towerButtonSell = new TowerButton(
         this.x - 16,
@@ -427,19 +444,41 @@ class Tower extends PIXI.Sprite {
   }
 
   addLevelUpPin() {
+    if (this.level === this.maxLevel) {
+      return;
+    }
     this.levelUpPin = PIXI.Sprite.from(levelUpTexture);
     this.levelUpPin.anchor.set(0.5);
     this.levelUpPin.width = 24;
     this.levelUpPin.height = 24;
     this.levelUpPin.tint = 0x00ff00;
-    this.levelUpPin.position.set(this.x - 24, this.y - 24);
+    this.levelUpPin.position.set(this.x - 18, this.y - 18);
     this.levelUpPin.zIndex = 999;
     app.stage.addChild(this.levelUpPin);
+  }
+
+  addCrown() {
+    if (this.crownTexture === null) {
+      return;
+    }
+    this.crownSprite = PIXI.Sprite.from(this.crownTexture);
+    this.crownSprite.anchor.set(0.5);
+    this.crownSprite.width = 24;
+    this.crownSprite.height = 24;
+    this.crownSprite.position.set(this.x - 18, this.y - 18);
+    this.crownSprite.zIndex = 999;
+    app.stage.addChild(this.crownSprite);
   }
 
   removeLevelUpPin() {
     app.stage.removeChild(this.levelUpPin);
     this.levelUpPin.destroy();
     this.levelUpPin = null;
+  }
+
+  removeCrown() {
+    app.stage.removeChild(this.crownSprite);
+    this.crownSprite.destroy();
+    this.crownSprite = null;
   }
 }

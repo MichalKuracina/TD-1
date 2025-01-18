@@ -46,6 +46,7 @@ let sprite;
 let towerSpritesheet;
 let roadSpritesheet;
 let levelUpTexture;
+let crownTexture;
 let heartSpr_big;
 
 let gold = 15;
@@ -104,6 +105,7 @@ function run() {
     const worldEditorSprite = PIXI.Sprite.from(worldEditorTexture);
 
     levelUpTexture = await PIXI.Assets.load("assets/levelup.png");
+    crownTexture = await PIXI.Assets.load("assets/crown.png");
 
     await grass();
 
@@ -344,6 +346,9 @@ function updateTick(deltaTime) {
       if (!tower.levelUpPin) {
         tower.addLevelUpPin();
       }
+      if (tower.level === 10 && tower.levelUpPin !== null) {
+        tower.removeLevelUpPin();
+      }
     } else {
       if (tower.levelUpPin) {
         tower.removeLevelUpPin();
@@ -496,7 +501,8 @@ function onDragEnd(event) {
         event.data.global.x,
         event.data.global.y,
         dragTarget.label,
-        true
+        true,
+        crownTexture
       );
       app.stage.addChild(turret);
       towers.push(turret);
