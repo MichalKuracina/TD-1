@@ -1,0 +1,25 @@
+{
+  "name": "td-1",
+  "version": "1.0.0",
+  "description": "Tower Defense",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MichalKuracina/TD-1.git"
+  },
+  "keywords": [
+    "html",
+    "js",
+    "css",
+    "td"
+  ],
+  "author": "Michal Kuracina",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/MichalKuracina/TD-1/issues"
+  },
+  "homepage": "https://github.com/MichalKuracina/TD-1#readme"
+}
